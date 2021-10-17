@@ -36,7 +36,7 @@ kFilter = KalmanFilter()
 
 for i in range(numpy.size(timeAxis)):
     # hier die Daten ins Kalman-Filter eingeben
-    # output = kFilter.Step(input)
+    output = kFilter.Step(input)
     pass
 
 # Hier das Ergebnis über die Zeit plotten.

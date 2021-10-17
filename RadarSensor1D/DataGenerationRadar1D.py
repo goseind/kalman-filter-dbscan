@@ -34,12 +34,6 @@ Example:
     timeAxis, distValues, velValues = GenerateData(type="Static", options=opt)
 '''
 
-opt = {
-        "initialDistance": 5
-        "stopTime": 1
-    }
-    timeAxis, distValues, velValues = GenerateData(type="Static", options=opt)
-
 def GenerateData(type="Static", options={}):
 
     # static
