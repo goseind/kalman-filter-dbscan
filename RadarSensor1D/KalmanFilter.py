@@ -1,6 +1,6 @@
 import numpy as np
 
-
+# https://www.youtube.com/watch?v=CaCcOwJPytQ&list=PLX2gX-ftPVXU3oUFNATxGXY90AULiqnWT
 class KalmanFilter:
     # Initialisierung von Kalman Filter
     def __init__(self, X, P, dt):
@@ -14,7 +14,7 @@ class KalmanFilter:
         self.A = np.array([[1,dt],[0,1]])
         self.B = np.array([[0.5*dt**2],[dt]])
         # control variable matrix
-        self.u = 2
+        self.u = 0
         # noise
         self.w = 0
         self.C = np.array([[1,0],[0,1]])
