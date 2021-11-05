@@ -38,7 +38,7 @@ Aufgabe:
 
 
 # Hier Ihr Kalman-Filter initialisieren
-kFilter = KalmanFilter(np.array([[distValues[0]],[velValues[0]]]), np.array([[0.4**2,0],[0,0.4**2]]), 0.01)
+kFilter = KalmanFilter(np.array([[distValues[0]],[velValues[0]]]), np.array([[1**2,0],[0,3**2]]), 0.01)
 values = []
 
 for i in range(np.size(timeAxis)):
@@ -53,11 +53,11 @@ pVelValues = [values[i][1][0] for i in range(len(values))]
 plt.figure()
 # plt.plot(timeAxis, values)
 plt.plot(timeAxis, pDistValues)
-# plt.plot(timeAxis, pVelValues)
+plt.plot(timeAxis, pVelValues)
 plt.plot(timeAxis, distValues)
-# plt.plot(timeAxis, velValues)
-# plt.legend(["Pred. Distance", "Pred. Velocity","Distance", "Velocity"])
-plt.legend(["Pred. Distance","Distance"])
+plt.plot(timeAxis, velValues)
+plt.legend(["Pred. Distance", "Pred. Velocity","Distance", "Velocity"])
+# plt.legend(["Pred. Distance","Distance"])
 plt.grid(True)
 plt.show()
 
