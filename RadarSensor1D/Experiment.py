@@ -31,14 +31,20 @@ Aufgabe:
 2. Testen Sie das Kalman-Filter mit verschiedener Objektbewegungsarten.
 '''
 
-# Hier Ihr Kalman-Filter initialisieren
-R = np.diag([rangeAccuracy, velocityAccuracy])
-Q = np.zeros((2,2))
-s0 = np.array([distValues[0], velValues[0]])
-transition_model = np.array([[1,0.01],
-                             [0,1]])
-H =  np.array([[1., 0.],
-               [0., 1.]])
+# Measurement Error
+## Variance of a uniform distribution is given by (b-a)**2/12.
+R = np.diag([rangeAccuracy**2, velocityAccuracy**2])/3
+# todo: Add variance.
+Q = np.diag([0,0,0])
+# todo: add column for acceleration
+s0 = np.array([distValues[0], velValues[0], 0])
+#todo: Add acceleration.
+transition_model = np.array([[1, 0.01, 0.01/2],
+                             [0, 1, 0.01],
+                             [0, 0, 0.01]])
+# todo: adjust H for accomodating acceleration.
+H =  np.array([[1., 0., 0.],
+               [0., 1., 0.]])
 
 KalmanFilter = KalmanFilter(s0, transition_model, H, Q, R)
 
