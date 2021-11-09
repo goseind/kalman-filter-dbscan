@@ -32,13 +32,20 @@ Aufgabe:
 '''
 
 # Hier Ihr Kalman-Filter initialisieren
+
+# Messwerte
 x = np.array(distValues[0], velValues[0])
-P = np.diag([rangeAccuracy**2, velocityAccuracy**2])/3
+
+# Kovarianz
+P = np.diag([rangeAccuracy**2, velocityAccuracy**2])
+
+# Transition
 dt = 0.1
 F = np.array([1, dt],
              [0, 1])
-kFilter = KalmanFilter()
 
+# Kalman Filter
+kFilter = KalmanFilter()
 
 for i in range(np.size(timeAxis)):
     # hier die Daten ins Kalman-Filter eingeben
