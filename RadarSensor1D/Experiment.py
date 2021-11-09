@@ -33,7 +33,7 @@ Aufgabe:
 
 # Hier Ihr Kalman-Filter initialisieren
 x = np.array(distValues[0], velValues[0])
-P = np.diag([rangeAccuracy**2, (velocityAccuracy/3)**2])
+P = np.diag([rangeAccuracy**2, velocityAccuracy**2])/3
 dt = 0.1
 F = np.array([1, dt],
              [0, 1])
