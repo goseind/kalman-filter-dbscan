@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-import numpy
-from DataGenerationRadar1D import GenerateData
+import numpy as np
+from DataGenerationRadar1D import GenerateData, rangeAccuracy, velocityAccuracy
 from KalmanFilter import KalmanFilter
 
 opt = {
@@ -8,10 +8,11 @@ opt = {
         "stopTime": 1,
         "movementRange": 1,
         "frequency": 2,
-        "SporadicError": 3
+        "SporadicError": 3,
+        "velocity": 3
     }
 
-timeAxis, distValues, velValues, truthDistValues, truthVelValues = GenerateData(type="Sinus", options=opt)
+timeAxis, distValues, velValues, truthDistValues, truthVelValues = GenerateData(type="Static", options=opt)
 
 plt.figure()
 plt.plot(timeAxis, distValues)
@@ -31,10 +32,15 @@ Aufgabe:
 '''
 
 # Hier Ihr Kalman-Filter initialisieren
+x = np.array(distValues[0], velValues[0])
+P = np.diag([rangeAccuracy**2, (velocityAccuracy/3)**2])
+dt = 0.1
+F = np.array([1, dt],
+             [0, 1])
 kFilter = KalmanFilter()
 
 
-for i in range(numpy.size(timeAxis)):
+for i in range(np.size(timeAxis)):
     # hier die Daten ins Kalman-Filter eingeben
     # output = kFilter.Step(input)
     pass

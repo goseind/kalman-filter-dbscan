@@ -1,8 +1,10 @@
-
+import numpy as np
 
 class KalmanFilter:
     # Initialisierung von Kalman Filter
-    def __init__(self):
+    def __init__(self, s_hat, P):
+        #self.P_hat = np.eye(len(s_hat)) * 100
+        
         pass
 
     # Diese Funktion nimmt die Messwerten und gibt 
