@@ -24,7 +24,7 @@ Aufgabe:
 # Kalman Filter Initialization
 
 ## Parameters and values
-dt = .1 #Time step
+dt = 1.5 #Time step ??
 R_var = rangeAccuracy
 Q_var = velocityAccuracy
 x = np.array([[distValues[0], velValues[0]]]).T
@@ -34,7 +34,7 @@ F = np.array([[1, dt],
 H = np.array([[1., 0.]])
 R = np.array([[R_var]])
 Q = Q_discrete_white_noise(dim=2, dt=dt, var=Q_var)
-pred = [] # Array for predictions
+pred_distance = [] # Array for predictions
 cov = []
 
 ## Kalman Filter Instance
@@ -42,19 +42,19 @@ kFilter = KalmanFilter(x, P, F, H, R, Q)
 
 ## Data loop to go through all dist/vel values
 for i in range(np.size(timeAxis)):
-    input = distValues[i] # Vel Value??
+    input = velValues[i]
     output = kFilter.Step(input)
-    pred.append(output)
+    pred_distance.append(output)
 
 ## Plot predictions
 plt.figure()
-plt.plot(timeAxis, distValues)
+# plt.plot(timeAxis, distValues)
 plt.plot(timeAxis, velValues)
-plt.plot(timeAxis, truthDistValues)
-plt.plot(timeAxis, truthVelValues)
-plt.plot(timeAxis, np.squeeze(pred))
+# plt.plot(timeAxis, truthDistValues)
+# plt.plot(timeAxis, truthVelValues)
+plt.plot(timeAxis, np.squeeze(pred_distance)) # Squeeze Method??
 plt.xlabel("time in s")
-plt.legend(["Distance", "Velocity", "Truth distance", "Truth velocity", "Prediction"])
+plt.legend(["Velocity", "Vel. Prediction"]) # "Truth distance", "Truth velocity"
 plt.title("Measurement Data of a 1D Radar Sensor")
 plt.grid(True)
 plt.show()
