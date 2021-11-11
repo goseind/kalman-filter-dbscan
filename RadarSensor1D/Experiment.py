@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from DataGenerationRadar1D import GenerateData, rangeAccuracy, velocityAccuracy # Import variables too
 from KalmanFilter import KalmanFilter
-from other_func import Q_discrete_white_noise # Import noise function
+from WhiteNoise import Q_discrete_white_noise # Import noise function
 
 opt = {
         "initialDistance": 8,
@@ -52,9 +52,9 @@ plt.plot(timeAxis, distValues)
 plt.plot(timeAxis, velValues)
 plt.plot(timeAxis, truthDistValues)
 plt.plot(timeAxis, truthVelValues)
-# plt.plot(timeAxis, pred)
+plt.plot(timeAxis, np.squeeze(pred))
 plt.xlabel("time in s")
-plt.legend(["Distance", "Velocity", "Truth distance", "Truth velocity"])
+plt.legend(["Distance", "Velocity", "Truth distance", "Truth velocity", "Prediction"])
 plt.title("Measurement Data of a 1D Radar Sensor")
 plt.grid(True)
 plt.show()

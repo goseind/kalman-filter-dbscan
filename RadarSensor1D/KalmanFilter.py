@@ -1,10 +1,9 @@
 from matplotlib.pyplot import xcorr
 import numpy as np
 from scipy.linalg import inv
-from other_func import Q_discrete_white_noise # Import noise function
+from WhiteNoise import Q_discrete_white_noise # Import noise function
 
 ## Kalman Filter Class
-
 class KalmanFilter:
 
     # Class Initialization
