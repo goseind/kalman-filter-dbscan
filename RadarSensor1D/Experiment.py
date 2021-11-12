@@ -13,7 +13,7 @@ opt = {
         "velocity": 3 # Add velocity
     }
 
-timeAxis, distValues, velValues, truthDistValues, truthVelValues = GenerateData(type="Sinus", options=opt)
+timeAxis, distValues, velValues, truthDistValues, truthVelValues = GenerateData(type="Triangle", options=opt)
 
 '''
 Aufgabe:
