@@ -9,7 +9,7 @@ opt = {
         "stopTime": 1,
         "movementRange": 1,
         "frequency": 2,
-        "SporadicError": 1,
+        "SporadicError": 3,
         "velocity": 3 # Add velocity
     }
 

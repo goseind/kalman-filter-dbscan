@@ -17,8 +17,8 @@ minRange = 0.3  # m
 maxRange = 25.0  # m
 maxVelocity = 25  # m/s --> 90 km/h
 
-rangeAccuracy = 0.02  # m
-velocityAccuracy = 0.005  # m/s
+rangeAccuracy = 0.25  # m
+velocityAccuracy = 0.5  # m/s
 measurementRate = 100  # Hz
 
 '''
