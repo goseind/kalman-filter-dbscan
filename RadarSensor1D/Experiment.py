@@ -9,11 +9,11 @@ opt = {
         "stopTime": 1,
         "movementRange": 1,
         "frequency": 2,
-        "SporadicError": 3,
+        "SporadicError": 1,
         "velocity": 3 # Add velocity
     }
 
-timeAxis, distValues, velValues, truthDistValues, truthVelValues = GenerateData(type="Static", options=opt)
+timeAxis, distValues, velValues, truthDistValues, truthVelValues = GenerateData(type="Sinus", options=opt)
 
 '''
 Aufgabe:
