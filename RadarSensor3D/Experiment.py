@@ -1,7 +1,15 @@
+from numpy.linalg import det
 from DataGenerationRadar3D import RadarSensor, Target
 import numpy
-import matplotlib.pyplot as pyplot
+import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+
+# Defining plot
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
 
 '''
 Example for creating a target and design its path
@@ -24,11 +32,13 @@ opt = {
 }
 
 x = Target(opt)
+y = Target(opt) # Adding target 
+z = Target(opt) # Adding target
 
 '''
 You can add multiple targets to the list
 '''
-targets = [x]
+targets = [x] # Just one target for the moment
 
 '''
 Setup the radar sensor
@@ -48,6 +58,7 @@ Here we loop through all targets and get the current radar detection
 - apply your DBScan here 
 - apply your Kalman Filter here
 '''
+
 getNext = True
 while(getNext == True):
     for target in targets:
@@ -55,7 +66,14 @@ while(getNext == True):
         getNext = getNext & ~target.reachedEnd    
 
     dets = sensor.Detect(targets)
+    
+    # Adding detections to plot
+    for det in dets:
+        ax.scatter(det[0], det[1], det[2])
 
     '''
     Ideas: To include previous detections?
     '''
+
+# Plot result
+plt.show()
