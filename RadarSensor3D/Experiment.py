@@ -4,7 +4,7 @@ import numpy
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-# Defining plot
+# Defining 3D plot
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.set_xlabel('X')
@@ -14,31 +14,67 @@ ax.set_zlabel('Z')
 '''
 Example for creating a target and design its path
 '''
-path = [[0,5,0],
+path_1 = [[0,5,0],
         [0,5,0.5],
         [1,5,1],
         [1,5,0.5],
         [0.5, 2, 0.1]]
 
-vel = 3 * numpy.ones((1,5))
-vel[0,2] = 1
+# Adding targets
+path_2 = [[0,4,0],
+        [0,3,0.5],
+        [1,2,1],
+        [1,1,0.5],
+        [0.5, 1, 0.1]]
+path_3 = [[2,7,0],
+        [0,3,0.3],
+        [2,6,4],
+        [2,4,0.6],
+        [0.6, 4, 0.2]]
 
-InitialPosition = numpy.array([-1,5,0])
+vel_1 = 3 * numpy.ones((1,5))
+vel_1[0,2] = 1
 
-opt = {
-    'InitialPosition' : InitialPosition,
-    'Path' : numpy.array(path).transpose(),
-    'Velocities' : vel
+# Adding targets
+vel_2 = 3 * numpy.ones((1,5))
+vel_2[0,2] = 1
+vel_3 = 3 * numpy.ones((1,5))
+vel_3[0,2] = 1
+
+InitialPosition_1 = numpy.array([-1,5,0])
+
+# Adding targets
+InitialPosition_2 = numpy.array([6,7,4])
+InitialPosition_3 = numpy.array([9,8,9])
+
+opt_t_1 = {
+    'InitialPosition' : InitialPosition_1,
+    'Path' : numpy.array(path_1).transpose(),
+    'Velocities' : vel_1
 }
 
-x = Target(opt)
-y = Target(opt) # Adding target 
-z = Target(opt) # Adding target
+# Adding targets
+opt_t_2 = {
+    'InitialPosition' : InitialPosition_2,
+    'Path' : numpy.array(path_2).transpose(),
+    'Velocities' : vel_2
+}
+opt_t_3 = {
+    'InitialPosition' : InitialPosition_3,
+    'Path' : numpy.array(path_3).transpose(),
+    'Velocities' : vel_3
+}
+
+t_1 = Target(opt_t_1)
+
+# Adding targets
+t_2 = Target(opt_t_2)
+t_3 = Target(opt_t_3)
 
 '''
 You can add multiple targets to the list
 '''
-targets = [x] # Just one target for the moment
+targets = [t_1, t_2, t_3] # Adding targets
 
 '''
 Setup the radar sensor
