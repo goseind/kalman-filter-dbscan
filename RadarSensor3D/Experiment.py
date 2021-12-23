@@ -2,9 +2,6 @@ from DataGenerationRadar3D import RadarSensor, Target
 import numpy as np
 import matplotlib.pyplot as plt
 from DBScan import DBSCAN
-from RadarSensor1D.KalmanFilter import KalmanFilter
-import matplotlib.pyplot as pyplot
-from mpl_toolkits.mplot3d import Axes3D
 import queue
 
 '''
@@ -39,7 +36,7 @@ x_2 = Target(opt_2)
 '''
 You can add multiple targets to the list
 '''
-# targets = [x_1]
+#targets = [x_2]
 targets = [x_1, x_2]
 
 '''
@@ -67,8 +64,6 @@ points = list()
 number_points = 15
 predict_queue = queue.Queue(number_points)
 
-fig = plt.figure()
-ax = fig.add_subplot(projection='3d')
 while (getNext == True):
     for target in targets:
         target.Step(1 / sensor.opt['MeasurementRate'])
