@@ -45,7 +45,7 @@ class DBSCAN():
                 if label == -2:
                     stack.extend(neighbours[n])
                 # If not core point (edge of cluster).
-                if label == -1:
+                if label < 0:
                     self.assignment[n] = cluster
             
             cluster += 1
