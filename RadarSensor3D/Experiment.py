@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from DBScan import DBSCAN
 import matplotlib.pyplot as pyplot
 from mpl_toolkits.mplot3d import Axes3D
+import queue
 
 '''
 Example for creating a target and design its path
@@ -59,8 +60,11 @@ Here we loop through all targets and get the current radar detection
 - apply your Kalman Filter here
 '''
 getNext = True
-vel = list()
+model = DBSCAN(minpts=5, eps=0.5)
+predictions = list()
 points = list()
+number_points = 15
+predict_queue = queue.Queue(number_points)
 
 fig = plt.figure()
 ax = fig.add_subplot(projection='3d')
@@ -70,20 +74,18 @@ while (getNext == True):
         getNext = getNext & ~target.reachedEnd
 
     dets = sensor.Detect(targets)
+
     for det in dets:
-        points.append(det[:3])
-        ax.scatter(det[0], det[1], det[2])
+        predict_queue.put(det[:3])
+        if predict_queue.full():
+            pred = model.fit_predict(np.array(list(predict_queue.queue)))
+            points.append(det[:3])
+            predictions.append(pred[-1])
+            predict_queue.get()
 
-plt.show()
-
-model = DBSCAN()
-points = np.array(points)
-prediction = model.fit_predict(points)
-print(prediction)
-
-v = prediction
 fig = plt.figure()
 ax = fig.add_subplot(projection='3d')
-ax.scatter(points[:, 0], points[:, 1], points[:, 2], c=prediction)
+points_np = np.array(points)
+ax.scatter(points_np[:, 0], points_np[:, 1], points_np[:, 2], c=predictions)
 
 plt.show()
