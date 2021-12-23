@@ -2,6 +2,7 @@ from DataGenerationRadar3D import RadarSensor, Target
 import numpy as np
 import matplotlib.pyplot as plt
 from DBScan import DBSCAN
+from RadarSensor1D.KalmanFilter import KalmanFilter
 import matplotlib.pyplot as pyplot
 from mpl_toolkits.mplot3d import Axes3D
 import queue
@@ -60,7 +61,7 @@ Here we loop through all targets and get the current radar detection
 - apply your Kalman Filter here
 '''
 getNext = True
-model = DBSCAN(minpts=5, eps=0.5)
+model = DBSCAN(minpts=3, eps=0.5)
 predictions = list()
 points = list()
 number_points = 15
@@ -79,6 +80,7 @@ while (getNext == True):
         predict_queue.put(det[:3])
         if predict_queue.full():
             pred = model.fit_predict(np.array(list(predict_queue.queue)))
+
             points.append(det[:3])
             predictions.append(pred[-1])
             predict_queue.get()
