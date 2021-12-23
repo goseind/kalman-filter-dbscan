@@ -5,6 +5,7 @@ How does DBSCAN work: https://en.wikipedia.org/wiki/DBSCAN
 from collections import deque
 # dataset to toy around with.
 from sklearn.datasets import make_moons
+import numpy as np
 
 def pairwise_sq_distance(X1, X2):
     # Calculate the pairwise distance between all pairs of points from X1 and X2.
@@ -45,12 +46,12 @@ class DBSCAN():
                 if label == -2:
                     stack.extend(neighbours[n])
                 # If not core point (edge of cluster).
-                if label == -1:
+                if label < 0:
                     self.assignment[n] = cluster
             
             cluster += 1
         
-    def predict(self, X):
+    def fit_predict(self, X):
         self.fit(X)
         return self.assignment
     
