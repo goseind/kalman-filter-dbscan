@@ -3,6 +3,7 @@ from DataGenerationRadar3D import RadarSensor, Target
 import numpy
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from sklearn.cluster import DBSCAN
 
 # Defining 3D plot
 fig = plt.figure()
@@ -74,7 +75,7 @@ t_3 = Target(opt_t_3)
 '''
 You can add multiple targets to the list
 '''
-targets = [t_1, t_2, t_3] # Adding targets
+targets = [t_1] # Adding targets
 
 '''
 Setup the radar sensor
@@ -94,6 +95,8 @@ Here we loop through all targets and get the current radar detection
 - apply your DBScan here 
 - apply your Kalman Filter here
 '''
+sum = []
+lab = []
 
 getNext = True
 while(getNext == True):
@@ -102,6 +105,20 @@ while(getNext == True):
         getNext = getNext & ~target.reachedEnd    
 
     dets = sensor.Detect(targets)
+
+    # Sum um last elements/detections
+    sum.append(dets)
+    if len(sum) < 5:
+        l = len(sum)
+        last_elements = sum[-l]
+        print(last_elements)
+    else:
+        last_elements = sum[-5]
+        print(last_elements)
+    
+    # Scan last five elements
+    cluster = DBSCAN(eps=0.5, min_samples=2).fit(last_elements)
+    lab.append(cluster.labels_)
     
     # Adding detections to plot
     for det in dets:
@@ -112,4 +129,5 @@ while(getNext == True):
     '''
 
 # Plot result
+#print(lab)
 plt.show()
