@@ -50,7 +50,7 @@ class DBSCAN():
                     self.assignment[n] = cluster
             
             cluster += 1
-        
+            
     def fit_predict(self, X):
         self.fit(X)
         return self.assignment

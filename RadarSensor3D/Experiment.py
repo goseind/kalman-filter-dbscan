@@ -8,6 +8,7 @@ from mpl_toolkits.mplot3d import Axes3D
 '''
 Example for creating a target and design its path
 '''
+
 # Parameters first target.
 path1 = [[0,5,0],
          [0,5,0.5],
@@ -182,6 +183,3 @@ if __name__ == "__main__":
     # ax3.set_zlim3d(0, 5)
     
     # ax3.scatter(Detections[:ante,0], Detections[:ante,1], Detections[:ante,2], c = clusters)
-    
-    
-    

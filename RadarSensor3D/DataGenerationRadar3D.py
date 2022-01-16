@@ -11,8 +11,6 @@ Sensor characteristics
 '''
 
 import numpy
-
-
 minRange = 0.3  # m
 maxRange = 25.0  # m
 maxVelocity = 25  # m/s --> 90 km/h
