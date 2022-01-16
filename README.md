@@ -19,7 +19,7 @@ WiSe 2021/22
 * Kalman Filter 3D: [RadarSensor1D](/RadarSensor3D/KalmanFilter.py)
 
 ## Dokumentation
-Die Dokumentation und Berichtersattung erfolgt in folgendem [Jupyter Notebook](documentation.ipynb) & [Link zur Präsentation](https://docs.google.com/presentation/d/1tMrf8yo_mv9Uo4Sv87vI6JIYx5SxoOuYC4IeCOa-haQ/edit?usp=sharing)
+Die Dokumentation und Berichtersattung erfolgt in folgendem [Jupyter Notebook](bericht.ipynb) & [Link zur Präsentation](https://docs.google.com/presentation/d/1tMrf8yo_mv9Uo4Sv87vI6JIYx5SxoOuYC4IeCOa-haQ/edit?usp=sharing)
 
 ## Software Voraussetzungen
 * python
