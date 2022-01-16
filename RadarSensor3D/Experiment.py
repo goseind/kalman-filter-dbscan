@@ -154,6 +154,9 @@ if __name__ == "__main__":
     ax.plot3D(T1[:,0], T1[:,1], T1[:,2], 'blue')   
     ax.plot3D(T2[:,0], T2[:,1], T2[:,2], 'red')    
     
+    # show plot
+    plt.show()
+
     # Other previous visualization experiments.
     # model = DBSCAN(eps=0.2, minpts=7)        
     # T = np.vstack((T1,T2))
