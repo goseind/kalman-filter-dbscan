@@ -1,6 +1,7 @@
 '''
 How does DBSCAN work: https://en.wikipedia.org/wiki/DBSCAN
 '''
+import numpy as np
 # deque provides an O(1) time complexity for append and pop operations instead of O(n) for lists.
 from collections import deque
 # dataset to toy around with.
@@ -49,8 +50,8 @@ class DBSCAN():
                     self.assignment[n] = cluster
             
             cluster += 1
-        
-    def predict(self, X):
+            
+    def fit_predict(self, X):
         self.fit(X)
         return self.assignment
     

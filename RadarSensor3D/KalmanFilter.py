@@ -52,3 +52,46 @@ class KalmanFilter:
         self.s_hat = s_hat_p + K @ e_m_p
         
         return self.s_hat
+    
+    
+
+if __name__ == "__main__":
+    
+    # Measurement Error
+    ## Variance of a uniform distribution is given by (b-a)**2/12.
+    R = np.diag([1**2, 1**2])/3
+    # todo: Add variance.
+    Q = np.diag([0.05,0.05,0.05])
+    # todo: add column for acceleration
+    s0 = np.array([[1,1],
+                   [2,2],
+                   [3,3]])
+    #todo: Add acceleration.
+    transition_model = np.array([[1, 0.01, 0.01/2],
+                                 [0, 1, 0.01],
+                                 [0, 0, 0.01]])
+    # todo: adjust H for accomodating acceleration.
+    H =  np.array([[1., 0., 0.],
+                   [0., 1., 0.]])
+    kf = KalmanFilter(s0, transition_model, H, Q, R)
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

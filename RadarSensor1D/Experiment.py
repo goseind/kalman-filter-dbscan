@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-import numpy
-from DataGenerationRadar1D import GenerateData
+import numpy as np
+from DataGenerationRadar1D import GenerateData, rangeAccuracy, velocityAccuracy
 from KalmanFilter import KalmanFilter
 
 opt = {
@@ -8,10 +8,11 @@ opt = {
         "stopTime": 1,
         "movementRange": 1,
         "frequency": 2,
-        "SporadicError": 3
+        "SporadicError": 5,
+        "velocity": 3
     }
 
-timeAxis, distValues, velValues, truthDistValues, truthVelValues = GenerateData(type="Sinus", options=opt)
+timeAxis, distValues, velValues, truthDistValues, truthVelValues = GenerateData(type="ConstantVelocity", options=opt)
 
 plt.figure()
 plt.plot(timeAxis, distValues)
@@ -30,14 +31,31 @@ Aufgabe:
 2. Testen Sie das Kalman-Filter mit verschiedener Objektbewegungsarten.
 '''
 
-# Hier Ihr Kalman-Filter initialisieren
-kFilter = KalmanFilter()
+# Measurement Error
+## Variance of a uniform distribution is given by (b-a)**2/12.
+R = np.diag([rangeAccuracy**2, velocityAccuracy**2])/3
+# todo: Add variance.
+Q = np.diag([0,0,0])
+# todo: add column for acceleration
+s0 = np.array([distValues[0], velValues[0], 0])
+#todo: Add acceleration.
+transition_model = np.array([[1, 0.01, 0.01/2],
+                             [0, 1, 0.01],
+                             [0, 0, 0.01]])
+# todo: adjust H for accomodating acceleration.
+H =  np.array([[1., 0., 0.],
+               [0., 1., 0.]])
 
+KalmanFilter = KalmanFilter(s0, transition_model, H, Q, R)
 
-for i in range(numpy.size(timeAxis)):
-    # hier die Daten ins Kalman-Filter eingeben
-    # output = kFilter.Step(input)
-    pass
+Predictions = [s0]
+for i in range(1,np.size(timeAxis)):
+    s = np.array([distValues[i], velValues[i]])
+    pred = KalmanFilter.step(s)
+    Predictions.append(pred)
+    
+plt.plot(Predictions)
+
 
 # Hier das Ergebnis über die Zeit plotten.
 
