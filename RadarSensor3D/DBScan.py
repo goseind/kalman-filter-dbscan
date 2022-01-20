@@ -22,7 +22,7 @@ class DBSCAN():
         neighbours = list(map(lambda d: np.arange(d.shape[0])[d < self.eps**2], dist))
         
         # Label all points as outliers initially.
-        self.assignment = np.full((X.shape[0],), -1, dtype=np.int)
+        self.assignment = np.full((X.shape[0],), -1, dtype=int)
         # Find core points.
         ## Determine the number of neighbors of each point.
         N_neighbors = np.sum(dist < self.eps**2, axis=1)
