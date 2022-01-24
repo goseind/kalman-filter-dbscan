@@ -1,4 +1,4 @@
-'''
+''' 
 This script simulates a 1D-Radar-Sensor capable of outputing 
 detected position and velocity and amplitude of an object.
 
@@ -33,6 +33,7 @@ Example:
     }
     timeAxis, distValues, velValues = GenerateData(type="Static", options=opt)
 '''
+
 def GenerateData(type="Static", options={}):
 
     # static

@@ -12,13 +12,13 @@ opt = {
         "velocity": 3
     }
 
-timeAxis, distValues, velValues, truthDistValues, truthVelValues = GenerateData(type="ConstantVelocity", options=opt)
+timeAxis, distValues, velValues = GenerateData(type="ConstantVelocity", options=opt)
 
 plt.figure()
 plt.plot(timeAxis, distValues)
 plt.plot(timeAxis, velValues)
-plt.plot(timeAxis, truthDistValues)
-plt.plot(timeAxis, truthVelValues)
+#plt.plot(timeAxis, truthDistValues)
+#plt.plot(timeAxis, truthVelValues)
 plt.xlabel("time in s")
 plt.legend(["Distance", "Velocity", "Truth distance", "Truth velocity"])
 plt.title("Measurement Data of a 1D Radar Sensor")
