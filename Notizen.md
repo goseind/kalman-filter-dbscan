@@ -36,8 +36,16 @@ Alle:
 * Anhang
 * Verwendete Literatur
 
-# Notizen zum Script
+## Notizen zum Script --> Fragen für morgen
 
-* Radialgeschwindigkeit
-* Beschleunigung
-* 
+* Radialgeschwindigkeit im 3D Experiment
+* Beschleunigung im 1D Experiment
+* Rückgabewert 1D Kalman zum plotten
+* Issues in GitHub?
+* Interaktivität im Juypter Notebook
+* Bonus Aufgabe
+* Generelle offene Punkte?
+
+
+
+-  Mercury
