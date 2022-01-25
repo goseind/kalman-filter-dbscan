@@ -1,4 +1,5 @@
 import numpy as np
+from QMatrix import Q_discrete_white_noise as QMatrix
 
 class KalmanFilter:
     # Initialisierung von Kalman Filter
@@ -7,7 +8,7 @@ class KalmanFilter:
         self.P_hat = np.eye(len(s_hat)) * 100
         self.model = transition_model
         self.H = H # Measurement Function
-        self.Q = Q # Process Noise
+        self.Q = QMatrix(dim=3, dt=dt, var=Q_var)
         self.R = R # Measurement Noise.
         pass
 
