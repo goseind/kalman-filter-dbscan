@@ -31,6 +31,7 @@ class Target:
     def __init__(self, opt):
         self.ValidateOption(opt)
         self.currentPosition = self.opt['InitialPosition']
+        self.Trajectory = [self.opt['InitialPosition']]
         self.velocityVector = numpy.zeros((3,))
         self.pathCounter = 0
         self.reachedEnd = False
@@ -84,6 +85,7 @@ class Target:
         if (numpy.linalg.norm(nextPosition - self.currentPosition) < numpy.linalg.norm(
                 self.opt['Path'][:, self.pathCounter] - self.currentPosition)):
             self.currentPosition = nextPosition
+            self.Trajectory.append(nextPosition)
             self.velocityVector = velocityVector
             return self.currentPosition, self.velocityVector
 
@@ -120,6 +122,7 @@ class Target:
 
             self.velocityVector = velocityVector
             self.currentPosition = nextPosition
+            self.Trajectory.append(nextPosition)
             return self.currentPosition, self.velocityVector
 
     def __GetVelocityVector(self, Position1, Position2, Velocity):

@@ -1,6 +1,7 @@
 '''
 How does DBSCAN work: https://en.wikipedia.org/wiki/DBSCAN
 '''
+import numpy as np
 # deque provides an O(1) time complexity for append and pop operations instead of O(n) for lists.
 from collections import deque
 # dataset to toy around with.
@@ -22,7 +23,7 @@ class DBSCAN():
         neighbours = list(map(lambda d: np.arange(d.shape[0])[d < self.eps**2], dist))
         
         # Label all points as outliers initially.
-        self.assignment = np.full((X.shape[0],), -1, dtype=np.int)
+        self.assignment = np.full((X.shape[0],), -1, dtype=int)
         # Find core points.
         ## Determine the number of neighbors of each point.
         N_neighbors = np.sum(dist < self.eps**2, axis=1)
@@ -50,7 +51,7 @@ class DBSCAN():
                     self.assignment[n] = cluster
             
             cluster += 1
-        
+            
     def fit_predict(self, X):
         self.fit(X)
         return self.assignment
