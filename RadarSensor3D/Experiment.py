@@ -101,7 +101,6 @@ while(getNext == True):
     dets = sensor.Detect(targets)
     # Exclude radialVelocity for the moment. (todo: include it.)
     for det in dets:
-        det = det[:-1]
         Detections = np.vstack((det, Detections))
     
     # Execute once to initialize filters etc. todo: Is there a smarter way to do all below ?
@@ -120,7 +119,7 @@ while(getNext == True):
             # Find index of first occurence of target j in clusters. This line is needed to filter out false detections
             obj_idx = np.where(clusters == j)[0][0]
             # Add placeholder values for speed and acceleration in each component to the detection.
-            s0 = np.vstack((Detections[obj_idx], np.zeros((2,3))))
+            s0 = np.vstack((Detections[obj_idx,:-1], np.zeros((2,3))))
             Filters.append(KalmanFilter(s0, transition_model, H, Q, R))
             # For the moment only the predicted position is relevant. todo: incorporate velocity.
             Preds.append(s0[0,:])
@@ -133,7 +132,7 @@ while(getNext == True):
             try:
                 obj_idx = np.where(clusters == j)[0][0]
                 # Reshape is needed to make matrix multiplication inside the kalman filter work.
-                s = Detections[obj_idx].reshape(1,3)
+                s = Detections[obj_idx,:-1].reshape(1,3)
                 s_hat = Filters[j].step(s)
                 Preds[j] = np.vstack((s_hat[0,:], Preds[j]))
             except IndexError:
