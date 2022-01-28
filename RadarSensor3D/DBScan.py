@@ -6,7 +6,6 @@ import numpy as np
 from collections import deque
 # dataset to toy around with.
 from sklearn.datasets import make_moons
-import numpy as np
 
 def pairwise_sq_distance(X1, X2):
     # Calculate the pairwise distance between all pairs of points from X1 and X2.

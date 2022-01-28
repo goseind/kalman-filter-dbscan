@@ -1,21 +1,22 @@
 import numpy as np
 from QMatrix import Q_discrete_white_noise as QMatrix
 
+
 class KalmanFilter:
     # Initialisierung von Kalman Filter
     def __init__(self, s_hat, transition_model, H, Q, R):
         self.s_hat = s_hat
         self.P_hat = np.eye(len(s_hat)) * 100
         self.model = transition_model
-        self.H = H # Measurement Function
-        self.Q = QMatrix(dim=3, dt=dt, var=Q_var)
-        self.R = R # Measurement Noise.
+        self.H = H  # Measurement Function
+        self.Q = Q
+        self.R = R  # Measurement Noise.
         pass
 
-    def step(self,z):
+    def step(self, z):
         # Prediction
         s_hat_p = self.model @ self.s_hat
-        P_hat_p = self.model @ self.P_hat @ self.model.T +  self.Q
+        P_hat_p = self.model @ self.P_hat @ self.model.T + self.Q
         # Calculate Kalman Matrix
         K = P_hat_p @ self.H.T @ np.linalg.inv(self.H @ P_hat_p @ self.H.T + self.R)
         # Update covariance of estimation error
@@ -23,5 +24,5 @@ class KalmanFilter:
         # Improve estimate
         e_m_p = z - self.H @ s_hat_p
         self.s_hat = s_hat_p + K @ e_m_p
-        
+
         return self.s_hat
