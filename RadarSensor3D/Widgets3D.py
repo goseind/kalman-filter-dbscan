@@ -15,6 +15,7 @@ eps_ia = widgets.FloatSlider(
     readout_format='.1f',
 )
 
+
 minpts_ia = widgets.IntSlider(
     value=2,
     min=1,
