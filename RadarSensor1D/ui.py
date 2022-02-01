@@ -263,6 +263,27 @@ r = widgets.HBox([r0_widget, r1_widget])
 kalman_widgets = [HTML(value="<h4>Kalman settings</h4>"), q, r]
 kalman_ui = widgets.VBox(kalman_widgets)
 
+update_dict = {'type_value': type_widget,
+               'initialDistance': initialDistance_widget,
+               'stopTime': stopTime_widget,
+               'movementRange': movementRange_widget,
+               'frequency': frequency_widget,
+               'SporadicError': sporadicError_widget,
+               'velocity': velocity_widget,
+               'initialVelocity': initialVelocity_widget,
+               'acceleration': acceleration_widget,
+               'minRange_value': minRange_widget,
+               'maxRange_value': maxRange_widget,
+               'maxVelocity_value': maxVelocity_widget,
+               'rangeAccuracy_value': rangeAccuracy_widget,
+               'velocityAccuracy_value': velocityAccuracy_widget,
+               'measurementRate_value': measurementRate_widget,
+               'q0': q0_widget,
+               'q1': q1_widget,
+               'q2': q2_widget,
+               'r0': r0_widget,
+               'r1': r1_widget, }
+
 
 def setup_ui(type_value):
     for widget in option_widgets:
