@@ -322,3 +322,49 @@ def update_sensor_settings(minRange_value, maxRange_value, maxVelocity_value, ra
     gen.maxVelocity = maxVelocity_value
     gen.rangeAccuracy = rangeAccuracy_value
     gen.velocityAccuracy = velocityAccuracy_value
+    gen.measurementRate = measurementRate_value
+
+
+def foo():
+    data_dist.set_xdata(timeAxis)
+    true_dist.set_xdata(timeAxis)
+    kalman_1D_dist.set_xdata(timeAxis)
+    data_vel.set_xdata(timeAxis)
+    true_vel.set_xdata(timeAxis)
+    kalman_1D_vel.set_xdata(timeAxis)
+
+
+def update_x_axis(values, graphs):
+    for graph in graphs:
+        graph.set_xdata(values)
+
+
+def update_y_axis(values, graphs):
+    for value, graph in zip(values, graphs):
+        graph.set_ydata(value)
+
+
+def setup_opt(initialDistance, initialVelocity, stopTime, movementRange, frequency, SporadicError, velocity,
+              acceleration):
+    return {
+        "initialDistance": initialDistance,
+        "initialVelocity": initialVelocity,
+        "stopTime": stopTime,
+        "movementRange": movementRange,
+        "frequency": frequency,
+        "SporadicError": SporadicError,
+        "velocity": velocity,
+        "acceleration": acceleration
+
+    }
+
+
+def update_predictions(kalman_filter, time_axis, s0, dist_values, vel_values):
+    Predictions = [s0]
+    for i in range(1, np.size(time_axis)):
+        s = np.array([dist_values[i], vel_values[i]])
+        pred = kalman_filter.step(s)
+        Predictions.append(pred)
+
+    Predictions = np.reshape(Predictions, (3, np.size(time_axis)))
+    return Predictions
