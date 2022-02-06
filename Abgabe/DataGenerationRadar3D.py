@@ -17,7 +17,7 @@ maxVelocity = 25  # m/s --> 90 km/h
 
 rangeAccuracy = 0.05  # m
 velocityAccuracy = 0.005  # m/s
-measurementRate = 30  # Hz
+measurementRate = 100  # Hz                 # --> von uns angepasst
 
 sensorPosition = numpy.array([0,0,0.8]) # x,y,z-coordinate of the sensor
 
@@ -193,7 +193,7 @@ class RadarSensor:
         # add noise / false detection ?
         if(('FalseDetection' in self.opt) == True):
             if(self.opt['FalseDetection'] == True):
-                for i in range(20):
+                for i in range(3):             # --> von uns angepasst
                     randPos = numpy.random.uniform(self.opt['MinRange'], 2 * self.opt['MaxRange'], 3)
                     randVel = numpy.random.uniform(0, 2 * self.opt['MaxVelocity'], 1)
                     visibleHor = False
