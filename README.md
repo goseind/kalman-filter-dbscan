@@ -2,10 +2,10 @@
 
 |Gruppenmitglied|Matrikelnummer|
 |---|---|
-|Christian Singer|?|
-|Domenic Gosein|002160647|
-|Lukas Burger|?|
-|Maximilian Kürschner|?|
+|Christian Singer|2161064|
+|Domenic Gosein|2160647|
+|Lukas Burger|2150580|
+|Maximilian Kürschner|2160331|
 
 Dozent: Dr.-Ing. Wei Yap Tan  
 
