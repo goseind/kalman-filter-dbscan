@@ -193,7 +193,7 @@ class RadarSensor:
         # add noise / false detection ?
         if(('FalseDetection' in self.opt) == True):
             if(self.opt['FalseDetection'] == True):
-                for i in range(3):
+                for i in range(20):
                     randPos = numpy.random.uniform(self.opt['MinRange'], 2 * self.opt['MaxRange'], 3)
                     randVel = numpy.random.uniform(0, 2 * self.opt['MaxVelocity'], 1)
                     visibleHor = False
