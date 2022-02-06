@@ -1,32 +1,5 @@
 import numpy as np
 
-
-model_move = lambda est, dt: np.array([est[0] + est[1]*dt, 1])
-
-class abFilter():
-    def __init__(self, a, model):
-        self.a = a
-        self.epoch = 0
-        self.estimate = None
-        # Process model
-        self.model = model
-        
-    def step(self, s, dt):
-        
-        if self.estimate is None:
-            self.estimate = s
-            return s
-        
-        else:
-            # Predict
-            s_pred = self.model(self.estimate,dt)
-            
-            # Update
-            residual = s - s_pred
-            self.estimate = self.estimate + self.a * residual
-            return self.estimate
-
-
 class KalmanFilter:
     # Initialisierung von Kalman Filter
     def __init__(self, s_hat, transition_model, H, Q, R):
@@ -36,8 +9,6 @@ class KalmanFilter:
         self.H = H # Measurement Function
         self.Q = Q # Process Noise
         self.R = R # Measurement Noise.
-        pass
-
 
     def step(self,z):
         # Prediction
@@ -52,46 +23,13 @@ class KalmanFilter:
         self.s_hat = s_hat_p + K @ e_m_p
         
         return self.s_hat
-    
-    
 
-if __name__ == "__main__":
-    
-    # Measurement Error
-    ## Variance of a uniform distribution is given by (b-a)**2/12.
-    R = np.diag([1**2, 1**2])/3
-    # todo: Add variance.
-    Q = np.diag([0.05,0.05,0.05])
-    # todo: add column for acceleration
-    s0 = np.array([[1,1],
-                   [2,2],
-                   [3,3]])
-    #todo: Add acceleration.
-    transition_model = np.array([[1, 0.01, 0.01/2],
-                                 [0, 1, 0.01],
-                                 [0, 0, 0.01]])
-    # todo: adjust H for accomodating acceleration.
-    H =  np.array([[1., 0., 0.],
-                   [0., 1., 0.]])
-    kf = KalmanFilter(s0, transition_model, H, Q, R)
-    
+def compute_mse(pred_val, truth_val, val):
+    diff_sensor_pred = pred_val - truth_val
+    diff_sensor_data = val - truth_val
 
+    mse_sens_pred = np.sum(diff_sensor_pred ** 2) / np.prod(diff_sensor_pred.shape)
 
+    mse_sens_data = np.sum(diff_sensor_data ** 2) / np.prod(diff_sensor_data.shape)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return mse_sens_pred, mse_sens_data, mse_sens_data - mse_sens_pred
