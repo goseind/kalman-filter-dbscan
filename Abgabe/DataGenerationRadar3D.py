@@ -17,7 +17,8 @@ maxVelocity = 25  # m/s --> 90 km/h
 
 rangeAccuracy = 0.05  # m
 velocityAccuracy = 0.005  # m/s
-measurementRate = 100  # Hz                 # --> von uns angepasst
+measurementRate = 100  # Hz                 # --> von uns angepasst: ursprünglich 30 Hz
+falseDetectionsRange = 20                   # --> von uns angepasst: hinzugefügt
 
 sensorPosition = numpy.array([0,0,0.8]) # x,y,z-coordinate of the sensor
 
@@ -132,6 +133,8 @@ class RadarSensor:
         opt['RangeAccuracy'] = rangeAccuracy
         opt['VelocityAccuracy'] = velocityAccuracy
         opt['MeasurementRate'] = 30
+        if('falseDetectionsRange' not in self.opt):              # --> von uns angepasst: Parameter in opt hinzugefügt 
+            opt['falseDetectionsRange'] = falseDetectionsRange          # --> von uns angepasst: Parameter in opt hinzugefügt  
 
     def ValidateOption(self, opt):
         if(('Position' in opt) == False):
@@ -193,7 +196,7 @@ class RadarSensor:
         # add noise / false detection ?
         if(('FalseDetection' in self.opt) == True):
             if(self.opt['FalseDetection'] == True):
-                for i in range(3):             # --> von uns angepasst
+                for i in range(self.opt['falseDetectionsRange']):                 # --> von uns angepasst Parameter in opt hinzugefügt  
                     randPos = numpy.random.uniform(self.opt['MinRange'], 2 * self.opt['MaxRange'], 3)
                     randVel = numpy.random.uniform(0, 2 * self.opt['MaxVelocity'], 1)
                     visibleHor = False

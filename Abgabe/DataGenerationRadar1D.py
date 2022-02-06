@@ -126,7 +126,7 @@ def GenerateData(type="Static", options={}):
             velValues[ind] = numpy.random.uniform(-1*maxVelocity,
                                            maxVelocity, numpy.shape(ind))
 
-        return timeAxis, distValues, velValues
+        return timeAxis, distValues, velValues, truthDistValues, truthVelValues     # --> von uns angepasst: hinzugefügt
 
     # constant acceleration
     if(type == "ConstantAcceleration"):
