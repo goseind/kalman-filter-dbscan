@@ -368,3 +368,69 @@ def update_predictions(kalman_filter, time_axis, s0, dist_values, vel_values):
 
     Predictions = np.reshape(Predictions, (3, np.size(time_axis)))
     return Predictions
+
+
+def plot_interactive_kalaman_filter():
+    fig = plt.figure()
+    ax_dist = fig.add_subplot(211)
+    ax_vel = fig.add_subplot(212)
+
+    opt = {
+        "initialDistance": 8,
+        "stopTime": 1,
+        "movementRange": 1,
+        "frequency": 2,
+        "SporadicError": 5,
+        "velocity": 3
+    }
+
+    timeAxis, distValues, velValues, truthDistValues, truthVelValues = gen.GenerateData(type="Static", options=opt)
+
+    R = np.diag([gen.rangeAccuracy ** 2, gen.velocityAccuracy ** 2]) / 3
+    Q = np.diag([0, 0, 0])
+    s0 = np.array([distValues[0], velValues[0], 0])
+    transition_model = np.array([[1, 0.01, 0.01 / 2],
+                                 [0, 1, 0.01],
+                                 [0, 0, 0.01]])
+    H = np.array([[1., 0., 0.],
+                  [0., 1., 0.]])
+    kalmanFilter1D = KalmanFilter(s0, transition_model, H, Q, R)
+
+    Predictions = [s0]
+    for i in range(1, np.size(timeAxis)):
+        s = np.array([distValues[i], velValues[i]])
+        pred = kalmanFilter1D.step(s)
+        Predictions.append(pred)
+
+    Predictions = np.reshape(Predictions, (3, np.size(timeAxis)))
+    kalman_1D_dist, = ax_dist.plot(timeAxis, Predictions[0])
+    kalman_1D_vel, = ax_vel.plot(timeAxis, Predictions[1])
+    data_dist, = ax_dist.plot(timeAxis, distValues)
+    data_vel, = ax_vel.plot(timeAxis, velValues)
+    true_dist, = ax_dist.plot(timeAxis, truthDistValues)
+    true_vel, = ax_vel.plot(timeAxis, truthVelValues)
+
+    def update(initialDistance, initialVelocity, stopTime, movementRange, frequency, SporadicError, velocity,
+               acceleration, minRange_value, maxRange_value, maxVelocity_value, rangeAccuracy_value,
+               velocityAccuracy_value, measurementRate_value, q0, q1, q2, r0, r1, type_value='Static', ):
+        opt = setup_opt(initialDistance, initialVelocity, stopTime, movementRange, frequency, SporadicError, velocity,
+                        acceleration)
+        setup_ui(type_value)
+        update_sensor_settings(minRange_value, maxRange_value, maxVelocity_value, rangeAccuracy_value,
+                               velocityAccuracy_value, measurementRate_value)
+        timeAxis, distValues, velValues, truthDistValues, truthVelValues = gen.GenerateData(type=type_value, options=opt)
+
+        s0 = np.array([distValues[0], velValues[0], 0])
+        R = np.diag([r0, r1])
+        Q = np.diag([q0, q1, q2])
+        kalmanFilter1D = KalmanFilter(s0, transition_model, H, Q, R)
+        Predictions = update_predictions(kalmanFilter1D, timeAxis, s0, distValues, velValues)
+
+        update_x_axis(timeAxis, [data_dist, true_dist, kalman_1D_dist, data_vel, true_vel, kalman_1D_vel])
+        update_y_axis([truthDistValues, truthVelValues, Predictions[0], Predictions[1], distValues, velValues],
+                      [true_dist, true_vel, kalman_1D_dist, kalman_1D_vel, data_dist, data_vel])
+        fig.canvas.draw_idle()
+
+    out = widgets.interactive_output(update, update_dict)
+    ui = widgets.HBox([option_ui, sensor_ui, kalman_ui])
+    display(out, ui)
