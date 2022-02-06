@@ -33,13 +33,17 @@ Teilaufgabe 2:
 - [x] Sinnvolle Verwendung der Clustering-Ergebnisse als Eingangsdaten des Kalman-Filters
 - [ ] Verbesserung der Messgenauigkeit + Detektion von Ausreißer
 
-## Implementierung
+## Abgabe
+
+Siehe [Abgabe Ordner](Abgabe)
+
+### Implementierung
 
 * [Kalman Filter 1D](/RadarSensor1D/KalmanFilter.py)
 * [DBSCAN 3D](/RadarSensor3D/DBScan.py)
 * [Kalman Filter 3D](/RadarSensor3D/KalmanFilter.py)
 
-## Dokumentation
+### Dokumentation
 
 * [Bericht als Jupyter Notebook](bericht.ipynb)
 * [Bericht als PDF](bericht.pdf)
