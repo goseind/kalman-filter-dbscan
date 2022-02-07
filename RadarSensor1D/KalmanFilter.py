@@ -1,7 +1,5 @@
 import numpy as np
 
-model_move = lambda est, dt: np.array([est[0] + est[1]*dt, 1])
-
 class KalmanFilter:
     # Initialisierung von Kalman Filter
     def __init__(self, s_hat, transition_model, H, Q, R):
@@ -12,7 +10,6 @@ class KalmanFilter:
         self.Q = Q # Process Noise
         self.R = R # Measurement Noise.
         pass
-
 
     def step(self,z):
         # Prediction
