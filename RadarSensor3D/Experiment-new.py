@@ -76,6 +76,7 @@ def scan_with_filter(model, pt_history, targets, R, Q, transition_model, H):
     # Count number of iterations
     i = 0
     labeled = {}
+    predictions = {}
     filters = {}
 
     while(getNext == True):
@@ -103,9 +104,10 @@ def scan_with_filter(model, pt_history, targets, R, Q, transition_model, H):
                     last_obj_idx = -1
 
                 if j not in labeled.keys():
+                    labeled[j] = detections[obj_idx]
                     s0 = np.vstack((detections[obj_idx,:-1], np.zeros((2,3))))
                     filters[j] = KalmanFilter(s0, transition_model, H, Q, R)
-                    labeled[j] = [s0[0,:]]
+                    predictions[j] = [s0[0,:]]
                 else:
                     # try to check if label swap occured + correct it
                     # check if last detection is in the cluster if its not an outlier and we had enough found clusters (last_obj_idx)
@@ -117,9 +119,10 @@ def scan_with_filter(model, pt_history, targets, R, Q, transition_model, H):
                             
 
                 s = filters[j].step(detections[obj_idx,:-1])
-                labeled[j] = np.vstack((s[0,:], labeled[j]))
+                predictions[j] = np.vstack((s[0,:], predictions[j]))
+                labeled[j] = np.vstack((detections[obj_idx], labeled[j]))
                 
-    return labeled
+    return predictions
 
 # Measurement error.
 ## Variance of a uniform distribution is given by (b-a)**2/12.
@@ -134,7 +137,7 @@ transition_model = np.array([[1, 0.01, 0.01/2],
 ## Transforms predicted quantities into outputs that can be compared to the measurements
 H =  np.array([[1., 0., 0.]])
 
-model = DBSCAN(eps=0.2, minpts=2)
+model = DBSCAN(eps=0.7, minpts=2)
 # Number of previous measurements to consider for DBSCAN().
 ante = 20
 
@@ -147,7 +150,8 @@ T2 = Preds[1][:-1]
 
 # Plot Trajectory
 fig = plt.figure()
-ax = plt.axes(projection='3d')   
+ax = plt.axes(projection='3d') 
+ax.set_title('New') 
 #ax.view_init(20, 35) 
 ax.plot3D(T1[:,0], T1[:,1], T1[:,2], 'blue')   
 ax.plot3D(T2[:,0], T2[:,1], T2[:,2], 'red')    
