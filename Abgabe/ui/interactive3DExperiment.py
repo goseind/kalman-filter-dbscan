@@ -12,9 +12,9 @@ from DataGenerationRadar3D import *
 from DBScan import *
 
 eps_ia = widgets.FloatSlider(
-    value=.2,
+    value=.7,
     min=.1,
-    max=1.,
+    max=1.5,
     step=.1,
     description='$\epsilon$',
     disabled=False,
@@ -52,7 +52,64 @@ plt_fdets_ia = widgets.Checkbox(
     indent=False
 )
 
+
+
 def plot_3DExperiment():
+    # Use DBSCAN to track the paths and Kalman to correct the measurment errors
+    def scan_with_filter(model, pt_history, sensor, targets, R, Q, transition_model, H):
+        getNext = True
+        detections = np.array([0,0,0,0])
+        # Count number of iterations
+        i = 0
+        labeled = {}
+        predictions = {}
+        filters = {}
+
+        while(getNext == True):
+            i += 1
+            for target in targets:
+                target.Step(1/sensor.opt['MeasurementRate'])
+                getNext = getNext & ~target.reachedEnd  
+
+            dets = sensor.Detect(targets)
+            for det in dets:
+                detections = np.vstack((det, detections))
+
+            if i >= pt_history:
+                # First application of DBSCAN.
+                clusters = model.fit_predict(detections[:pt_history])
+                # Determine number of targets (objects tracked).
+                num_objs = set(clusters)
+
+                for j in num_objs:
+                    # find index of first occurence of target j in clusters. This line is needed to filter out false detections
+                    obj_idx = np.where(clusters == j)[0][0]
+                    try:
+                        last_obj_idx = np.where(clusters == j)[0][1]
+                    except:
+                        last_obj_idx = -1
+
+                    if j not in labeled.keys():
+                        labeled[j] = detections[obj_idx]
+                        s0 = np.vstack((detections[obj_idx,:-1], np.zeros((2,3))))
+                        filters[j] = KalmanFilter(s0, transition_model, H, Q, R)
+                        predictions[j] = [s0[0,:]]
+                    else:
+                        # try to check if label swap occured + correct it
+                        # check if last detection is in the cluster if its not an outlier and we had enough found clusters (last_obj_idx)
+                        if (not detections[last_obj_idx] in labeled[j]) and (last_obj_idx != -1):
+                            for l in labeled.keys():
+                                if detections[last_obj_idx] in labeled[l]:
+                                    j = l
+                                    break
+                                
+
+                    s = filters[j].step(detections[obj_idx,:-1])
+                    predictions[j] = np.vstack((s[0,:], predictions[j]))
+                    labeled[j] = np.vstack((detections[obj_idx], labeled[j]))
+                    
+        return predictions
+
     def update(eps, minpts, targ_select, plt_fdets):
         
         # initialize DBScan
@@ -99,12 +156,12 @@ def plot_3DExperiment():
         }
 
         # Parameters third target
-        path3 = [[1. , 4. , 1. ],
-                [1. , 5. , 1.],
-                [2. , 5. , 1. ],
-                [3.5 , 4. , 2. ],
-                [3. , 4.1 , 1.],
-                [2.2 , 4. , 2. ]]
+        path3 = [[1. , 4. , 2. ],
+                [1. , 3. , 1.2],
+                [2. , 3. , 1. ],
+                [3.5 , 3. , 2. ],
+                [3. , 3.1 , 1.],
+                [2.2 , 3. , 2. ]]
 
         vel3 = 2 * np.ones((1,len(path3)))
         vel3[0,4] = 0.3
@@ -174,7 +231,7 @@ def plot_3DExperiment():
         ## Variance of a uniform distribution is given by (b-a)**2/12.
         R = np.diag([rangeAccuracy**2])/3
         # Process error.
-        Q = np.diag([0.05,0.05,0.05])
+        Q = np.diag([0.05, 0.05, 0.05])
         # Process/transition model.
         transition_model = np.array([[1, 0.01, 0.01/2],
                                     [0, 1, 0.01],
@@ -184,80 +241,15 @@ def plot_3DExperiment():
         H =  np.array([[1., 0., 0.]])
 
 
-        getNext = True
-        Detections = np.array([0,0,0])
-        
-        # Number of previous measurements to consider for DBSCAN().
-        ante = 20
-        # Count number of iterations
-        i = 0
-        
-        while(getNext == True):
-            i += 1
-            for target in targets:
-                target.Step(1/sensor.opt['MeasurementRate'])
-                getNext = getNext & ~target.reachedEnd  
 
-            dets = sensor.Detect(targets)
+        pt_history = 20
 
-            # Allow display of false detections only with one target
-            if len(targets) > 1:
-                plt_fdets_ia.disabled=True
-                plt_fdets_ia.value=False
-            else:
-                plt_fdets_ia.disabled=False
-
-            # plot flase dets only if checkbox is activated and only one target selected
-            if plt_fdets == True and len(targets) == 1:
-                try:
-                    p = dets[1]
-                    ax.scatter(p[0], p[1], p[2], s=50, c='tomato')
-                except IndexError:
-                    pass
-
-            for det in dets:
-                det = det[:-1]
-                Detections = np.vstack((det, Detections))
-
-            # Execute once to initialize filters etc. todo: Is there a smarter way to do all below ?
-            if i == ante:
-                # First application of DBSCAN.
-                clusters = model.fit_predict(Detections[:ante])
-                # Determine number of targets (objects tracked).
-                num_objs = len(set(clusters[clusters > -1]))
-
-                # "Filters" contains a kalman filter for each target.
-                Filters = []
-                # "Preds" contains the predictions of the path of each target.
-                Preds = []
-                # Iterate over the targets.
-                for j in range(num_objs):
-                    # Find index of first occurence of target j in clusters. This line is needed to filter out false detections
-                    obj_idx = np.where(clusters == j)[0][0]
-                    # Add placeholder values for speed and acceleration in each component to the detection.
-                    s0 = np.vstack((Detections[obj_idx], np.zeros((2,3))))
-                    Filters.append(KalmanFilter(s0, transition_model, H, Q, R))
-                    # For the moment only the predicted position is relevant. todo: incorporate velocity.
-                    Preds.append(s0[0,:])
-
-            # Cluster and predict position via Kalman filter.
-            elif i > ante:
-                clusters = model.fit_predict(Detections[:ante])
-                for j in range(num_objs):
-                    # try/ except prevents non-detection of existing object from breaking the program.
-                    try:
-                        obj_idx = np.where(clusters == j)[0][0]
-                        # Reshape is needed to make matrix multiplication inside the kalman filter work.
-                        s = Detections[obj_idx].reshape(1,3)
-                        s_hat = Filters[j].step(s)
-                        Preds[j] = np.vstack((s_hat[0,:], Preds[j]))
-                    except IndexError:
-                        print(f"Object {j} not found!")
-                        continue
+        predictions = scan_with_filter(model, pt_history, sensor, targets, R, Q, transition_model, H)
 
         # Visualize trajectory.
-        for pred, color in zip(Preds, colors_list):
-            T = pred[:-1]
+        for pred, color in zip(predictions, colors_list):
+            T = predictions[pred]
+            print(pred)
             ax.plot3D(T[:,0], T[:,1], T[:,2], color) 
         
         ax.set_xlim3d(0, 5)
