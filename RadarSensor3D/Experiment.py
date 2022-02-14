@@ -148,8 +148,8 @@ pt_history = 20
 predictions = scan_with_filter(model, pt_history, targets, R, Q, transition_model, H)
             
 # Visualize trajectory.
-T1 = predictions[0][:-1]
-T2 = predictions[1][:-1]
+T1 = predictions[0]
+T2 = predictions[1]
 
 # Plot Trajectory
 fig = plt.figure()

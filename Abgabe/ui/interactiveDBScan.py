@@ -14,7 +14,7 @@ from DBScan import *
 eps_ia_dbscan = widgets.FloatSlider(
     value=.7,
     min=.1,
-    max=1.,
+    max=1.5,
     step=.1,
     description='$\epsilon$',
     disabled=False,
@@ -133,13 +133,26 @@ def scan(model, pt_history, targets):
             num_objs = set(clusters)
 
             for j in num_objs:
-                # Find index of first occurence of target j in clusters. This line is needed to filter out false detections
+                # find index of first occurence of target j in clusters. This line is needed to filter out false detections
                 obj_idx = np.where(clusters == j)[0][0]
+                try:
+                    last_obj_idx = np.where(clusters == j)[0][1]
+                except:
+                    last_obj_idx = -1
 
                 if j not in labeled.keys():
-                    labeled[j] = detections[obj_idx,:-1]
+                    labeled[j] = [detections[obj_idx]]
+                else:
+                    # try to check if label swap occured + correct it
+                    # check if last detection is in the cluster if its not an outlier and we had enough found clusters (last_obj_idx)
+                    if (not detections[last_obj_idx] in labeled[j]) and (last_obj_idx != -1):
+                        for l in labeled.keys():
+                            if detections[last_obj_idx] in labeled[l]:
+                                j = l
+                                break
+                            
 
-                s = detections[obj_idx,:-1].reshape(1,3)
+                s = detections[obj_idx]
                 labeled[j] = np.vstack((s, labeled[j]))
                 
     return labeled
@@ -164,7 +177,7 @@ def plot_interactive_dbscan():
 
         # Plot Trajectories   
         for label in labeled.keys():
-            T = labeled[label];
+            T = labeled[label]
             ax.scatter(T[:,0], T[:,1], T[:,2], c=f'{colors[label]}')   
 
         # show plot
