@@ -5,6 +5,63 @@ from KalmanFilter import KalmanFilter
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+
+# Use DBSCAN to track the paths and Kalman to correct the measurment errors
+def scan_with_filter(model, pt_history, targets, R, Q, transition_model, H):
+    getNext = True
+    detections = np.array([0,0,0,0])
+    # Count number of iterations
+    i = 0
+    labeled = {}
+    predictions = {}
+    filters = {}
+
+    while(getNext == True):
+        i += 1
+        for target in targets:
+            target.Step(1/sensor.opt['MeasurementRate'])
+            getNext = getNext & ~target.reachedEnd  
+
+        dets = sensor.Detect(targets)
+        for det in dets:
+            detections = np.vstack((det, detections))
+
+        if i >= pt_history:
+            # First application of DBSCAN.
+            clusters = model.fit_predict(detections[:pt_history])
+            # Determine number of targets (objects tracked).
+            num_objs = set(clusters)
+
+            for j in num_objs:
+                # find index of first occurence of target j in clusters. This line is needed to filter out false detections
+                obj_idx = np.where(clusters == j)[0][0]
+                try:
+                    last_obj_idx = np.where(clusters == j)[0][1]
+                except:
+                    last_obj_idx = -1
+
+                if j not in labeled.keys():
+                    labeled[j] = detections[obj_idx]
+                    s0 = np.vstack((detections[obj_idx,:-1], np.zeros((2,3))))
+                    filters[j] = KalmanFilter(s0, transition_model, H, Q, R)
+                    predictions[j] = [s0[0,:]]
+                else:
+                    # try to check if label swap occured + correct it
+                    # check if last detection is in the cluster if its not an outlier and we had enough found clusters (last_obj_idx)
+                    if (not detections[last_obj_idx] in labeled[j]) and (last_obj_idx != -1):
+                        for l in labeled.keys():
+                            if detections[last_obj_idx] in labeled[l]:
+                                j = l
+                                break
+                            
+
+                s = filters[j].step(detections[obj_idx,:-1])
+                predictions[j] = np.vstack((s[0,:], predictions[j]))
+                labeled[j] = np.vstack((detections[obj_idx], labeled[j]))
+                
+    return predictions
+
+
 '''
 Example for creating a target and design its path
 '''
@@ -70,60 +127,6 @@ optRadar = {
 }
 sensor = RadarSensor(optRadar)
 
-def scan_with_filter(model, pt_history, targets, R, Q, transition_model, H):
-    getNext = True
-    detections = np.array([0,0,0,0])
-    # Count number of iterations
-    i = 0
-    labeled = {}
-    predictions = {}
-    filters = {}
-
-    while(getNext == True):
-        i += 1
-        for target in targets:
-            target.Step(1/sensor.opt['MeasurementRate'])
-            getNext = getNext & ~target.reachedEnd  
-
-        dets = sensor.Detect(targets)
-        for det in dets:
-            detections = np.vstack((det, detections))
-
-        if i >= pt_history:
-            # First application of DBSCAN.
-            clusters = model.fit_predict(detections[:pt_history])
-            # Determine number of targets (objects tracked).
-            num_objs = set(clusters)
-
-            for j in num_objs:
-                # find index of first occurence of target j in clusters. This line is needed to filter out false detections
-                obj_idx = np.where(clusters == j)[0][0]
-                try:
-                    last_obj_idx = np.where(clusters == j)[0][1]
-                except:
-                    last_obj_idx = -1
-
-                if j not in labeled.keys():
-                    labeled[j] = detections[obj_idx]
-                    s0 = np.vstack((detections[obj_idx,:-1], np.zeros((2,3))))
-                    filters[j] = KalmanFilter(s0, transition_model, H, Q, R)
-                    predictions[j] = [s0[0,:]]
-                else:
-                    # try to check if label swap occured + correct it
-                    # check if last detection is in the cluster if its not an outlier and we had enough found clusters (last_obj_idx)
-                    if (not detections[last_obj_idx] in labeled[j]) and (last_obj_idx != -1):
-                        for l in labeled.keys():
-                            if detections[last_obj_idx] in labeled[l]:
-                                j = l
-                                break
-                            
-
-                s = filters[j].step(detections[obj_idx,:-1])
-                predictions[j] = np.vstack((s[0,:], predictions[j]))
-                labeled[j] = np.vstack((detections[obj_idx], labeled[j]))
-                
-    return predictions
-
 # Measurement error.
 ## Variance of a uniform distribution is given by (b-a)**2/12.
 R = np.diag([rangeAccuracy**2])/3
@@ -139,52 +142,21 @@ H =  np.array([[1., 0., 0.]])
 
 model = DBSCAN(eps=0.7, minpts=2)
 # Number of previous measurements to consider for DBSCAN().
-ante = 20
+pt_history = 20
 
 
-Preds = scan_with_filter(model, ante, targets, R, Q, transition_model, H)
+predictions = scan_with_filter(model, pt_history, targets, R, Q, transition_model, H)
             
 # Visualize trajectory.
-T1 = Preds[0][:-1]
-T2 = Preds[1][:-1]
+T1 = predictions[0][:-1]
+T2 = predictions[1][:-1]
 
 # Plot Trajectory
 fig = plt.figure()
-ax = plt.axes(projection='3d') 
-ax.set_title('New') 
+ax = plt.axes(projection='3d')
 #ax.view_init(20, 35) 
 ax.plot3D(T1[:,0], T1[:,1], T1[:,2], 'blue')   
 ax.plot3D(T2[:,0], T2[:,1], T2[:,2], 'red')    
 
 # show plot
 plt.show()
-
-    # Other previous visualization experiments.
-    # model = DBSCAN(eps=0.2, minpts=7)        
-    # T = np.vstack((T1,T2))
-    # clusters = model.fit_predict(T)    
-    # fig = plt.figure()
-    # ax = plt.axes(projection ="3d")  
-    # ax.scatter(T[:,0], T[:,1], T[:,2], c = clusters)
-    
-    
-    # fig2 = plt.figure()
-    # ax2 = plt.axes(projection='3d')   
-    # #ax.view_init(20, 35) 
-    # ax2.plot3D(Detections[:,0], Detections[:,1], Detections[:,2], 'blue')       
-    
-    # ax2.set_xlim3d(0, 5)
-    # ax2.set_ylim3d(0, 5)
-    # ax2.set_zlim3d(0, 5)
-    
-    # model = DBSCAN(eps=0.2, minpts=3)  
-    # ante = -10   
-    # clusters = model.fit_predict(Detections[:ante])    
-    # fig = plt.figure()
-    # ax3 = plt.axes(projection ="3d") 
-    
-    # ax3.set_xlim3d(0, 5)
-    # ax3.set_ylim3d(0, 5)
-    # ax3.set_zlim3d(0, 5)
-    
-    # ax3.scatter(Detections[:ante,0], Detections[:ante,1], Detections[:ante,2], c = clusters)
