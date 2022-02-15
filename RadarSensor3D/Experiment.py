@@ -59,7 +59,7 @@ def scan_with_filter(model, pt_history, targets, R, Q, transition_model, H):
                 predictions[j] = np.vstack((s[0,:], predictions[j]))
                 labeled[j] = np.vstack((detections[obj_idx], labeled[j]))
                 
-    return predictions
+    return predictions, labeled
 
 
 def mse(paths: list, true_paths: list):
@@ -164,8 +164,13 @@ model = DBSCAN(eps=0.7, minpts=2)
 pt_history = 20
 
 
-predictions = scan_with_filter(model, pt_history, targets, R, Q, transition_model, H)
-            
+predictions, labeled = scan_with_filter(model, pt_history, targets, R, Q, transition_model, H)
+
+# Sensor measurements.
+## Only the position (first three coordinates) is of interest for the mse.
+sensor_dets1 = labeled[0][:,:-1]
+sensor_dets2 = labeled[1][:,:-1]
+
 # Visualize trajectory.
 T1 = predictions[0]
 T2 = predictions[1]
@@ -178,6 +183,12 @@ true_path_y = np.array(y.Trajectory) - sensor.opt["Position"]
 
 T1_true = true_path_x.reshape(-1,3) 
 T2_true = true_path_y.reshape(-1,3) 
+
+# Determine mse.
+mse_KF = mse([T1,T2],[true_path_x, true_path_y])
+mse_Sensor = mse([sensor_dets1, sensor_dets2],[true_path_x, true_path_y])
+print(f"Mean squared Error of Filter: {mse_KF}")
+print(f"Mean squared Error of Sensor: {mse_Sensor}")
 
 # Plot Trajectory
 fig = plt.figure()
