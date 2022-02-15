@@ -170,12 +170,24 @@ predictions = scan_with_filter(model, pt_history, targets, R, Q, transition_mode
 T1 = predictions[0]
 T2 = predictions[1]
 
+# True paths.
+## Sensor measures position of object relative to it hence this quantity needs to be subtracted.
+true_path_x = np.array(x.Trajectory) - sensor.opt["Position"]
+true_path_y = np.array(y.Trajectory) - sensor.opt["Position"]
+
+
+T1_true = true_path_x.reshape(-1,3) 
+T2_true = true_path_y.reshape(-1,3) 
+
 # Plot Trajectory
 fig = plt.figure()
 ax = plt.axes(projection='3d')
 #ax.view_init(20, 35) 
 ax.plot3D(T1[:,0], T1[:,1], T1[:,2], 'blue')   
-ax.plot3D(T2[:,0], T2[:,1], T2[:,2], 'red')    
+ax.plot3D(T2[:,0], T2[:,1], T2[:,2], 'red') 
+# Plot actual paths to get a visual intution for the accuracy of KF.
+ax.plot3D(T1_true[:,0], T1_true[:,1], T1_true[:,2], '#920010') # Deep Blue.  
+ax.plot3D(T2_true[:,0], T2_true[:,1], T2_true[:,2], '#1019DF') # Burgundy Red.
 
 # show plot
 plt.show()
