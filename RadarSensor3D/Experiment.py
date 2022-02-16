@@ -61,24 +61,28 @@ def scan_with_filter(model, pt_history, targets, R, Q, transition_model, H):
                 
     return predictions, labeled
 
-
 def mse(paths: list, true_paths: list):
     """
-    Predict the mean square error between a set of path predictions and the true path of the objects.
+    Predict the mean square error between a path prediction and the true path of the objects
+
     """
     
     Diffs = []
+    total_elements = 0
     # For-loop: Simple difference between a predicted path and a true measurement.
     for i, true_path in enumerate(true_paths):
         diff = true_path[-len(paths[i]):] - paths[i]
         Diffs.append(diff)
+        total_elements += len(diff)
         
+         
     # For-loop: Square and average the differences.
+    mse = 0
     for i, diff in enumerate(Diffs):
         # List diff is mapped to an integer (mse).
-        Diffs[i] = np.sum(diff**2)/ np.prod(diff.shape)
-        
-    return np.sum(Diffs)/ len(Diffs)
+        mse += np.sum(diff**2)/ np.prod(diff.shape) * (len(diff)/total_elements)
+
+    return mse
 
 
 '''
