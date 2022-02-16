@@ -3,11 +3,13 @@
 ## Externe Module
 from ipywidgets import *
 import numpy as np
+import random
 import matplotlib.pyplot as plt
 
 ## Eigen Module
 import DataGenerationRadar1D as gen
-from KalmanFilter import KalmanFilter, compute_mse
+from KalmanFilter import KalmanFilter
+from DataGenerationRadar1D import compute_mse
 
 style = {'description_width': 'initial'}
 
@@ -31,16 +33,15 @@ initialDistance_widget = widgets.IntSlider(
     style=style,
 )
 
-stopTime_widget = widgets.FloatSlider(
+stopTime_widget = widgets.IntSlider(
     value=1,
-    min=0.1,
-    max=10.0,
-    step=0.1,
+    min=1,
+    max=100,
+    step=1,
     description='StopTime:',
     disabled=False,
     orientation='horizontal',
     readout=True,
-    readout_format='.1f',
     continuous_update=False,
     style=style,
 )
@@ -76,7 +77,7 @@ frequency_widget = widgets.FloatSlider(
 sporadicError_widget = widgets.IntSlider(
     value=5,
     min=0,
-    max=10,
+    max=100,
     description='SporadicError:',
     disabled=False,
     orientation='horizontal',
@@ -134,9 +135,9 @@ option_ui = widgets.VBox(option_widgets)
 minRange_widget = widgets.FloatSlider(
     value=0.3,
     min=0,
-    max=10.0,
+    max=1.0,
     step=0.1,
-    description='MinRange:',
+    description='MinRange(m):',
     disabled=False,
     orientation='horizontal',
     readout=True,
@@ -148,9 +149,9 @@ minRange_widget = widgets.FloatSlider(
 maxRange_widget = widgets.FloatSlider(
     value=25.0,
     min=0.5,
-    max=50,
+    max=35,
     step=0.5,
-    description='MaxRange:',
+    description='MaxRange(m):',
     disabled=False,
     orientation='horizontal',
     readout=True,
@@ -162,8 +163,8 @@ maxRange_widget = widgets.FloatSlider(
 maxVelocity_widget = widgets.IntSlider(
     value=25,
     min=0,
-    max=100,
-    description='MaxVelocity:',
+    max=30,
+    description='MaxVelocity(m/s):',
     disabled=False,
     orientation='horizontal',
     continuous_update=False,
@@ -172,10 +173,10 @@ maxVelocity_widget = widgets.IntSlider(
 
 rangeAccuracy_widget = widgets.FloatSlider(
     value=0.02,
-    min=0.01,
-    max=1.0,
+    min=0.,
+    max=0.03,
     step=0.01,
-    description='RangeAccuracy:',
+    description='RangeAccuracy(m):',
     disabled=False,
     orientation='horizontal',
     readout=True,
@@ -189,7 +190,7 @@ velocityAccuracy_widget = widgets.FloatSlider(
     min=0,
     max=0.5,
     step=0.001,
-    description='VelocityAccuracy:',
+    description='VelocityAccuracy(m/s):',
     disabled=False,
     orientation='horizontal',
     readout=True,
@@ -203,7 +204,7 @@ measurementRate_widget = widgets.IntSlider(
     min=10,
     max=500,
     step=10,
-    description='MeasurementRate:',
+    description='MeasurementRate(Hz):',
     disabled=False,
     orientation='horizontal',
     continuous_update=False,
@@ -219,7 +220,7 @@ item_layout = Layout(height='100%', width='100px')
 q0_widget = widgets.BoundedFloatText(
     value=0,
     min=0,
-    max=10.0,
+    max=10000.0,
     description='Q:',
     disabled=False,
     style={'description_width': '10px'},
@@ -229,7 +230,7 @@ q0_widget = widgets.BoundedFloatText(
 q1_widget = widgets.BoundedFloatText(
     value=0,
     min=0,
-    max=10.0,
+    max=10000.0,
     description='',
     disabled=False,
     layout=item_layout
@@ -238,7 +239,7 @@ q1_widget = widgets.BoundedFloatText(
 q2_widget = widgets.BoundedFloatText(
     value=0,
     min=0,
-    max=10.0,
+    max=10000.0,
     disabled=False,
     layout=item_layout
 )
@@ -246,7 +247,7 @@ q2_widget = widgets.BoundedFloatText(
 r0_widget = widgets.BoundedFloatText(
     value=gen.rangeAccuracy ** 2 / 3,
     min=0,
-    max=10.0,
+    max=10000,
     description='R:',
     disabled=False,
     style={'description_width': '10px'},
@@ -256,7 +257,7 @@ r0_widget = widgets.BoundedFloatText(
 r1_widget = widgets.BoundedFloatText(
     value=gen.velocityAccuracy ** 2 / 3,
     min=0,
-    max=10.0,
+    max=10000,
     description='',
     disabled=False,
     layout=item_layout
@@ -402,9 +403,10 @@ def plot_interactive_kalaman_filter():
     R = np.diag([gen.rangeAccuracy ** 2, gen.velocityAccuracy ** 2]) / 3
     Q = np.diag([0, 0, 0])
     s0 = np.array([distValues[0], velValues[0], 0])
-    transition_model = np.array([[1, 0.01, 0.01 / 2],
-                                 [0, 1, 0.01],
-                                 [0, 0, 0.01]])
+    dt = 1 / gen.measurementRate
+    transition_model = np.array([[1, dt, dt ** 2 / 2],
+                                 [0, 1, dt],
+                                 [0, 0, dt]])
     H = np.array([[1., 0., 0.],
                   [0., 1., 0.]])
     kalmanFilter1D = KalmanFilter(s0, transition_model, H, Q, R)
@@ -414,12 +416,12 @@ def plot_interactive_kalaman_filter():
         pred = kalmanFilter1D.step(s)
         Predictions.append(pred)
     Predictions = np.array(Predictions)
-    kalman_1D_dist, = ax_dist.plot(timeAxis, Predictions[:, 0])
-    kalman_1D_vel, = ax_vel.plot(timeAxis, Predictions[:, 1])
-    data_dist, = ax_dist.plot(timeAxis, distValues)
-    data_vel, = ax_vel.plot(timeAxis, velValues)
-    true_dist, = ax_dist.plot(timeAxis, truthDistValues)
-    true_vel, = ax_vel.plot(timeAxis, truthVelValues)
+    kalman_1D_dist, = ax_dist.plot(timeAxis, Predictions[:, 0], 'go')
+    kalman_1D_vel, = ax_vel.plot(timeAxis, Predictions[:, 1], 'go')
+    data_dist, = ax_dist.plot(timeAxis, distValues, 'ro')
+    data_vel, = ax_vel.plot(timeAxis, velValues, 'ro')
+    true_dist, = ax_dist.plot(timeAxis, truthDistValues, 'b')
+    true_vel, = ax_vel.plot(timeAxis, truthVelValues, 'b')
 
     def update_visibility(values, true_values, pred_values):
         data_dist.set_visible(values)
@@ -441,7 +443,6 @@ def plot_interactive_kalaman_filter():
 
         timeAxis, distValues, velValues, truthDistValues, truthVelValues = gen.GenerateData(type=type_value,
                                                                                             options=opt)
-
         s0 = np.array([distValues[0], velValues[0], 0])
         R = np.diag([r0, r1])
         Q = np.diag([q0, q1, q2])
@@ -453,8 +454,28 @@ def plot_interactive_kalaman_filter():
         update_y_axis([truthDistValues, truthVelValues, Predictions[:, 0], Predictions[:, 1], distValues, velValues],
                       [true_dist, true_vel, kalman_1D_dist, kalman_1D_vel, data_dist, data_vel])
 
-        print("Position pred,data: ", compute_mse(Predictions[:, 0], truthDistValues, distValues))
-        print("Velocity pred,data: ", compute_mse(Predictions[:, 1], truthVelValues, velValues))
+        pos_pred, pos_sens, pos_ratio = compute_mse(Predictions[:, 0], truthDistValues, distValues)
+        vel_pred, vel_sens, vel_ratio = compute_mse(Predictions[:, 1], truthVelValues, velValues)
+        print(f"MSE der Messwerten : \t Pos: {pos_sens:>10.5f}  \t Vel: {vel_sens:>10.5f}")
+        print(f"MSE der Schätzwerte: \t Pos: {pos_pred:>10.5f}  \t Vel: {vel_pred:>10.5f}")
+        print(f"Verbesserung       : \t Pos: {pos_ratio:>10.5f} \t Vel: {vel_ratio:>10.5f}")
+
+        dist_mesurment_err = list()
+        vel_mesurment_err = list()
+        for i in range(10):
+            gen.seed = i
+            _, distValues_test, velValues_test, _, _ = gen.GenerateData(type=type_value,
+                                                                        options=opt)
+            dist_mesurment_err.append(np.var(distValues_test))
+            vel_mesurment_err.append(np.var(velValues_test))
+
+        gen.seed = 42
+        print(f"Varianz dist: {np.mean(dist_mesurment_err)}")
+        print(f"Varianz vel: {np.mean(vel_mesurment_err)}")
+
+        # TODO set the y_lim also and check for better ticks
+        ax_dist.set_xlim(min(timeAxis), max(timeAxis))
+        ax_vel.set_xlim(min(timeAxis), max(timeAxis))
 
         fig.canvas.draw_idle()
 
