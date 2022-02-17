@@ -316,23 +316,23 @@ def setup_ui(type_value):
         else:
             widget.disabled = True
 
-    if type_value is 'Static':
+    if type_value == 'Static':
         initialDistance_widget.disabled = False
         stopTime_widget.disabled = False
-    if type_value is 'ConstantVelocity':
+    if type_value == 'ConstantVelocity':
         initialDistance_widget.disabled = False
         stopTime_widget.disabled = False
         velocity_widget.disabled = False
-    if type_value is 'ConstantAcceleration':
+    if type_value == 'ConstantAcceleration':
         initialDistance_widget.disabled = False
         stopTime_widget.disabled = False
         initialVelocity_widget.disabled = False
         acceleration_widget.disabled = False
-    if type_value is 'Sinus':
+    if type_value == 'Sinus':
         movementRange_widget.disabled = False
         stopTime_widget.disabled = False
         frequency_widget.disabled = False
-    if type_value is 'Triangle':
+    if type_value == 'Triangle':
         initialDistance_widget.disabled = False
         stopTime_widget.disabled = False
         frequency_widget.disabled = False
@@ -385,7 +385,7 @@ def update_predictions(kalman_filter, time_axis, s0, dist_values, vel_values):
 
 
 def plot_interactive_kalaman_filter():
-    fig = plt.figure(figsize=(6, 4), dpi=100)
+    fig = plt.figure(figsize=(6, 4), dpi=100, facecolor='w')
     ax_dist = fig.add_subplot(211)
     ax_vel = fig.add_subplot(212)
 

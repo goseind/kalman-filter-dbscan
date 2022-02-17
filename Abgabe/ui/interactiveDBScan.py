@@ -12,9 +12,9 @@ from DataGenerationRadar3D import *
 from DBScan import *
 
 eps_ia_dbscan = widgets.FloatSlider(
-    value=.7,
+    value=1.5,
     min=.1,
-    max=1.5,
+    max=3,
     step=.1,
     description='$\epsilon$',
     disabled=False,
@@ -50,51 +50,93 @@ pt_history_ia_dbscan = widgets.IntSlider(
 )
 
 pttargets_ia_dbscan = widgets.SelectMultiple(
-    options=['Target 1', 'Target 2'],
+    options=['Target 1', 'Target 2', 'Target 3', 'Target 4'],
     value=['Target 1', 'Target 2'],
     #rows=10,
     description='Targets',
     disabled=False
 )
 
-# Parameters first target.
-path1 = [[0,5,0],
-         [0,5,0.5],
-         [1,4,1],
-         [2,3,2],
-         [1,5,3],
-         [1,5,0.5],
-         [0.5, 2, 0.1]]
+# Parameters first target
+path1 = [[0, 5, 0],
+            [0, 5, 0.5],
+            [1, 5, 1],
+            [1, 5, 0.5],
+            [0.5, 2, 0.1]]
 
-vel1 = 3 * np.ones((1,len(path1)))
-vel1[0,2] = 1
+vel1 = 3 * np.ones((1, 5))
+vel1[0, 2] = 1
 
-InitialPosition1 = np.array([-1,5,0])
+InitialPosition1 = np.array([-1, 5, 0])
 
 opt1 = {
-    'InitialPosition' : InitialPosition1,
-    'Path' : np.array(path1).transpose(),
-    'Velocities' : vel1
+    'InitialPosition': InitialPosition1,
+    'Path': np.array(path1).transpose(),
+    'Velocities': vel1
 }
 
-# Parameters second target.
-path2 = [[1. , 4. , 1. ],
-         [1. , 5. , 1.7],
-         [2. , 5. , 1. ],
-         [3. , 4. , 2. ],
-         [3. , 4. , 1.5],
-         [2. , 4. , 2. ]]
+# Parameters second target
+path2 = [[1., 4., 1.],
+            [1., 5., 1.7],
+            [2., 5., 1.],
+            [3., 4., 2.],
+            [3., 4., 1.5],
+            [2., 4., 2.]]
 
-vel2 = 2 * np.ones((1,len(path2)))
-vel2[0,4] = 0.5
+vel2 = 2 * np.ones((1, len(path2)))
+vel2[0, 4] = 0.5
 
-InitialPosition2 = np.array([2,4,1])
+InitialPosition2 = np.array([2, 4, 1])
 
 opt2 = {
-    'InitialPosition' : InitialPosition2,
-    'Path' : np.array(path2).transpose(),
-    'Velocities' : vel2
+    'InitialPosition': InitialPosition2,
+    'Path': np.array(path2).transpose(),
+    'Velocities': vel2
 }
+
+# Parameters third target
+path3 = [[1., 4., 2.],
+            [1., 3., 1.2],
+            [2., 3., 1.],
+            [2.5, 3., 2.],
+            [3., 3.1, 1.5],
+            [2.5, 3., 2.]]
+
+vel3 = 2 * np.ones((1, len(path3)))
+vel3[0, 4] = 0.3
+
+InitialPosition3 = np.array([3, 4, 5])
+
+opt3 = {
+    'InitialPosition': InitialPosition3,
+    'Path': np.array(path3).transpose(),
+    'Velocities': vel3
+}
+
+# Parameters fourth target
+path4 = [[1.5, 4.2, 1.5],
+            [1.5, 5.2, 1.2],
+            [2.5, 5.2, 1.2],
+            [3.5, 4.2, 2.2],
+            [3.5, 4.1, 1.4],
+            [2.2, 4.2, 2.3]]
+
+vel4 = 2 * np.ones((1, len(path4)))
+vel4[0, 4] = 0.7
+
+InitialPosition4 = np.array([4, 4, 4])
+
+opt4 = {
+    'InitialPosition': InitialPosition4,
+    'Path': np.array(path4).transpose(),
+    'Velocities': vel4
+}
+
+# Instantiate targets
+t_1 = Target(opt1)
+t_2 = Target(opt2)
+t_3 = Target(opt3)
+t_4 = Target(opt4)
 
 '''
 Setup the radar sensor
@@ -145,7 +187,7 @@ def scan(model, pt_history, targets):
                 else:
                     # try to check if label swap occured + correct it
                     # check if last detection is in the cluster if its not an outlier and we had enough found clusters (last_obj_idx)
-                    if (not detections[last_obj_idx] in labeled[j]) and (last_obj_idx != -1):
+                    if (not detections[:pt_history][last_obj_idx] in labeled[j]) and (last_obj_idx != -1):
                         for l in labeled.keys():
                             if detections[last_obj_idx] in labeled[l]:
                                 j = l
@@ -162,9 +204,11 @@ colors = { -1: 'red', 0: 'green', 1: 'yellow', 2: 'blue', 3: 'purple', 4: 'orang
 def plot_interactive_dbscan():
     def update_dbscan(eps, minpts, pt_history, target_select):
         ax.clear()
-        x = Target(opt1)
-        y = Target(opt2)
-        target_dict = {'Target 1': x, 'Target 2': y}
+        t_1 = Target(opt1)
+        t_2 = Target(opt2)
+        t_3 = Target(opt3)
+        t_4 = Target(opt4)
+        target_dict = {'Target 1': t_1, 'Target 2': t_2, 'Target 3': t_3, 'Target 4': t_4}
         
         targets = list()
         for target in target_select:

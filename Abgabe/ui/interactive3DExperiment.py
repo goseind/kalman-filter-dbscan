@@ -12,9 +12,9 @@ from DataGenerationRadar3D import *
 from DBScan import *
 
 eps_ia = widgets.FloatSlider(
-    value=.7,
+    value=1.5,
     min=.1,
-    max=1.5,
+    max=3,
     step=.1,
     description='$\epsilon$',
     disabled=False,
@@ -96,7 +96,7 @@ def plot_3DExperiment():
                     else:
                         # try to check if label swap occured + correct it
                         # check if last detection is in the cluster if its not an outlier and we had enough found clusters (last_obj_idx)
-                        if (not detections[last_obj_idx] in labeled[j]) and (last_obj_idx != -1):
+                        if (not detections[:pt_history][last_obj_idx] in labeled[j]) and (last_obj_idx != -1):
                             for l in labeled.keys():
                                 if detections[last_obj_idx] in labeled[l]:
                                     j = l
@@ -109,6 +109,13 @@ def plot_3DExperiment():
         return predictions
 
     def update(eps, minpts, targ_select, plt_fdets):
+        if len(targ_select) > 1:
+            plt_fdets = False
+            plt_fdets_ia.disabled = True
+            plt_fdets_ia.value = False
+        else:
+            plt_fdets_ia.disabled = False
+         
 
         # initialize DBScan
         model = DBSCAN(eps, minpts)
@@ -157,9 +164,9 @@ def plot_3DExperiment():
         path3 = [[1., 4., 2.],
                  [1., 3., 1.2],
                  [2., 3., 1.],
-                 [3.5, 3., 2.],
-                 [3., 3.1, 1.],
-                 [2.2, 3., 2.]]
+                 [2.5, 3., 2.],
+                 [3., 3.1, 1.5],
+                 [2.5, 3., 2.]]
 
         vel3 = 2 * np.ones((1, len(path3)))
         vel3[0, 4] = 0.3
@@ -217,7 +224,7 @@ def plot_3DExperiment():
         '''
 
         sens_position = np.array([0, 0, 0.5])
-        # ax.plot3D(sens_position[0], sens_position[1], sens_position[2], 'ro')
+        ax.plot3D(sens_position[0], sens_position[1], sens_position[2], 'ro')
 
         optRadar = {
             'Position': sens_position,
@@ -243,11 +250,18 @@ def plot_3DExperiment():
 
         predictions = scan_with_filter(model, pt_history, sensor, targets, R, Q, transition_model, H)
 
+        if plt_fdets:
+            T = predictions[-1]
+            ax.plot3D(T[:, 0], T[:, 1], T[:, 2], 'ro')
+
+        del predictions[-1]
+        
         # Visualize trajectory.
         for pred, color in zip(predictions, colors_list):
             T = predictions[pred]
-            print(pred)
             ax.plot3D(T[:, 0], T[:, 1], T[:, 2], color)
+        
+
 
         ax.set_xlim3d(0, 5)
         ax.set_ylim3d(0, 5)
@@ -255,7 +269,7 @@ def plot_3DExperiment():
 
         fig.canvas.draw_idle()
 
-    fig = plt.figure()  # figsize=(9, 8), dpi=100
+    fig = plt.figure(facecolor='w')  # figsize=(9, 8), dpi=100
     ax = plt.axes(projection='3d')
 
     ui = widgets.VBox([eps_ia,
