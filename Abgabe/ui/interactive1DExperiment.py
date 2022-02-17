@@ -385,7 +385,7 @@ def update_predictions(kalman_filter, time_axis, s0, dist_values, vel_values):
 
 
 def plot_interactive_kalaman_filter():
-    fig = plt.figure()
+    fig = plt.figure(figsize=(6, 4), dpi=100)
     ax_dist = fig.add_subplot(211)
     ax_vel = fig.add_subplot(212)
 
@@ -404,7 +404,7 @@ def plot_interactive_kalaman_filter():
     Q = np.diag([0, 0, 0])
     s0 = np.array([distValues[0], velValues[0], 0])
     dt = 1 / gen.measurementRate
-    transition_model = np.array([[1, dt, dt ** 2 / 2],
+    transition_model = np.array([[1, dt, dt / 2],
                                  [0, 1, dt],
                                  [0, 0, dt]])
     H = np.array([[1., 0., 0.],
