@@ -12,6 +12,12 @@ class KalmanFilter:
         self.R = R  # Measurement Noise.
 
     def step(self, z):
+        # if only positions are to be predicted by the kalman filter.
+        if z.shape[0] == 1:
+            H = np.array([self.H[0]])
+        # if velocity should be predicted as well.
+        else:
+            H = self.H
         # Prediction
         s_hat_p = self.model @ self.s_hat
         P_hat_p = self.model @ self.P_hat @ self.model.T + self.Q
