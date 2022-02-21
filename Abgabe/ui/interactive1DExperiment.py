@@ -470,8 +470,6 @@ def plot_interactive_kalaman_filter():
             vel_mesurment_err.append(np.var(velValues_test))
 
         gen.seed = 42
-        print(f"Varianz dist: {np.mean(dist_mesurment_err)}")
-        print(f"Varianz vel: {np.mean(vel_mesurment_err)}")
 
         # TODO set the y_lim also and check for better ticks
         ax_dist.set_xlim(min(timeAxis), max(timeAxis))
