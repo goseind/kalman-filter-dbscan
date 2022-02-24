@@ -106,7 +106,7 @@ def plot_3DExperiment():
                     predictions[j] = np.vstack((s[0, :], predictions[j]))
                     labeled[j] = np.vstack((detections[obj_idx], labeled[j]))
 
-        return predictions
+        return predictions, labeled
 
     def update(eps, minpts, targ_select, plt_fdets):
         if len(targ_select) > 1:
@@ -224,7 +224,7 @@ def plot_3DExperiment():
         '''
 
         sens_position = np.array([0, 0, 0.5])
-        ax.plot3D(sens_position[0], sens_position[1], sens_position[2], 'ro')
+        ax.plot3D(sens_position[0], sens_position[1], sens_position[2], 'ms')
 
         optRadar = {
             'Position': sens_position,
@@ -248,7 +248,9 @@ def plot_3DExperiment():
 
         pt_history = 20
 
-        predictions = scan_with_filter(model, pt_history, sensor, targets, R, Q, transition_model, H)
+        predictions, labeled = scan_with_filter(model, pt_history, sensor, targets, R, Q, transition_model, H)
+
+        # Determine mse.
 
         if plt_fdets:
             T = predictions[-1]
@@ -259,7 +261,15 @@ def plot_3DExperiment():
         # Visualize trajectory.
         for pred, color in zip(predictions, colors_list):
             T = predictions[pred]
+            if len(targets) == 1:
+                sensor_dets = labeled[pred][:,:-1]
+                true_path = np.array(targets[pred].Trajectory) - sensor.opt["Position"]
+                mse_KF = mse([T],[true_path])
+                mse_Sensor = mse([sensor_dets],[true_path])
+                print(f"Mean squared Error of Filter: {mse_KF}")
+                print(f"Mean squared Error of Sensor: {mse_Sensor}")
             ax.plot3D(T[:, 0], T[:, 1], T[:, 2], color)
+            print("")
         
 
 
@@ -279,3 +289,27 @@ def plot_3DExperiment():
     out = interactive_output(update,
                              {'eps': eps_ia, 'minpts': minpts_ia, 'targ_select': targets_ia, 'plt_fdets': plt_fdets_ia})
     display(ui, out)
+
+
+def mse(paths: list, true_paths: list):
+    """
+    Predict the mean square error between a path prediction and the true path of the objects
+
+    """
+    
+    Diffs = []
+    total_elements = 0
+    # For-loop: Simple difference between a predicted path and a true measurement.
+    for i, true_path in enumerate(true_paths):
+        diff = true_path[-len(paths[i]):] - paths[i]
+        Diffs.append(diff)
+        total_elements += len(diff)
+        
+         
+    # For-loop: Square and average the differences.
+    mse = 0
+    for i, diff in enumerate(Diffs):
+        # List diff is mapped to an integer (mse).
+        mse += np.sum(diff**2)/ np.prod(diff.shape) * (len(diff)/total_elements)
+
+    return mse
