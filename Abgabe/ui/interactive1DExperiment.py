@@ -63,7 +63,7 @@ movementRange_widget = widgets.FloatSlider(
 frequency_widget = widgets.FloatSlider(
     value=2,
     min=1,
-    max=10.0,
+    max=3.9,
     step=0.1,
     description='Frequency:',
     disabled=False,
@@ -263,7 +263,15 @@ r1_widget = widgets.BoundedFloatText(
     layout=item_layout
 )
 
-q = widgets.HBox([q0_widget, q1_widget, q2_widget])
+q_button = widgets.Checkbox(
+    value=False,
+    description='optimal',
+    disabled=False,
+    indent=False,
+    layout=item_layout,
+)
+
+q = widgets.HBox([q0_widget, q1_widget, q2_widget, q_button])
 r = widgets.HBox([r0_widget, r1_widget])
 
 kalman_widgets = [HTML(value="<h4>Kalman settings</h4>"), q, r]
@@ -306,7 +314,16 @@ update_dict = {'type_value': type_widget,
                'q1': q1_widget,
                'q2': q2_widget,
                'r0': r0_widget,
-               'r1': r1_widget, }
+               'r1': r1_widget,
+               'q_optimum': q_button}
+
+q_default_values = {
+    'Static': [0, 0, 0],
+    'ConstantVelocity': [0.000001, 0.00000001, 0.0000005],
+    'ConstantAcceleration': [0.000001, 0.000000005, 0.0000001],
+    'Sinus': [0.00005, 0.000003, 0.00001],
+    'Triangle': [0.0000001, 0.000003, 0.001],
+}
 
 
 def setup_ui(type_value):
@@ -385,9 +402,12 @@ def update_predictions(kalman_filter, time_axis, s0, dist_values, vel_values):
 
 
 def plot_interactive_kalaman_filter():
-    fig = plt.figure(figsize=(6, 4), dpi=100, facecolor='w')
-    ax_dist = fig.add_subplot(211)
-    ax_vel = fig.add_subplot(212)
+    fig = plt.figure(figsize=(8, 6), dpi=100, facecolor='w')
+    ax_dist = fig.add_subplot(311)
+    ax_vel = fig.add_subplot(312)
+
+    #fig_gain = plt.figure(figsize=(6, 4), dpi=100, facecolor='w')
+    #ax_gain = fig_gain.add_subplot()
 
     opt = {
         "initialDistance": 8,
@@ -404,7 +424,7 @@ def plot_interactive_kalaman_filter():
     Q = np.diag([0, 0, 0])
     s0 = np.array([distValues[0], velValues[0], 0])
     dt = 1 / gen.measurementRate
-    transition_model = np.array([[1, dt, dt / 2],
+    transition_model = np.array([[1, dt, dt ** 2 / 2],
                                  [0, 1, dt],
                                  [0, 0, dt]])
     H = np.array([[1., 0., 0.],
@@ -433,7 +453,7 @@ def plot_interactive_kalaman_filter():
 
     def update(initialDistance, initialVelocity, stopTime, movementRange, frequency, SporadicError, velocity,
                acceleration, minRange_value, maxRange_value, maxVelocity_value, rangeAccuracy_value,
-               velocityAccuracy_value, measurementRate_value, q0, q1, q2, r0, r1,
+               velocityAccuracy_value, measurementRate_value, q0, q1, q2, r0, r1, q_optimum,
                type_value='Static', ):
         opt = setup_opt(initialDistance, initialVelocity, stopTime, movementRange, frequency, SporadicError, velocity,
                         acceleration)
@@ -445,6 +465,10 @@ def plot_interactive_kalaman_filter():
                                                                                             options=opt)
         s0 = np.array([distValues[0], velValues[0], 0])
         R = np.diag([r0, r1])
+        if q_optimum:
+            q0_widget.value, q1_widget.value, q2_widget.value = q_default_values[type_value]
+            q0, q1, q2 = q_default_values[type_value]
+
         Q = np.diag([q0, q1, q2])
         kalmanFilter1D = KalmanFilter(s0, transition_model, H, Q, R)
         Predictions = update_predictions(kalmanFilter1D, timeAxis, s0, distValues, velValues)
@@ -456,6 +480,7 @@ def plot_interactive_kalaman_filter():
 
         pos_pred, pos_sens, pos_ratio = compute_mse(Predictions[:, 0], truthDistValues, distValues)
         vel_pred, vel_sens, vel_ratio = compute_mse(Predictions[:, 1], truthVelValues, velValues)
+
         print(f"MSE der Messwerten : \t Pos: {pos_sens:>10.5f}  \t Vel: {vel_sens:>10.5f}")
         print(f"MSE der Schätzwerte: \t Pos: {pos_pred:>10.5f}  \t Vel: {vel_pred:>10.5f}")
         print(f"Verbesserung       : \t Pos: {pos_ratio:>10.5f} \t Vel: {vel_ratio:>10.5f}")
@@ -474,6 +499,9 @@ def plot_interactive_kalaman_filter():
         # TODO set the y_lim also and check for better ticks
         ax_dist.set_xlim(min(timeAxis), max(timeAxis))
         ax_vel.set_xlim(min(timeAxis), max(timeAxis))
+
+        gain = np.array(kalmanFilter1D.K_gain)
+        # ax_gain.plot(timeAxis[:-1], gain[:, 0])
 
         fig.canvas.draw_idle()
 

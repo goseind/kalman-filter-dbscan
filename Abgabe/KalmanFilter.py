@@ -10,6 +10,7 @@ class KalmanFilter:
         self.H = H  # Measurement Function
         self.Q = Q  # Process Noise
         self.R = R  # Measurement Noise.
+        self.K_gain = list()
 
     def step(self, z):
         # if only positions are to be predicted by the kalman filter.
@@ -23,6 +24,7 @@ class KalmanFilter:
         P_hat_p = self.model @ self.P_hat @ self.model.T + self.Q
         # Calculate Kalman Matrix
         K = P_hat_p @ self.H.T @ np.linalg.inv(self.H @ P_hat_p @ self.H.T + self.R)
+        self.K_gain.append(K)
 
         # Update covariance of estimation error
         # self.P_hat = self.P_hat - K @ self.H @ self.P_hat
