@@ -1,51 +1,17 @@
-# Projektlabor Maschinelles Lernen (PML)
+# Kalman filter implementation with with DBSCAN clustering on 3d radar sensor
 
-|Gruppenmitglied|Matrikelnummer|
-|---|---|
-|Christian Singer|2161064|
-|Domenic Gosein|2160647|
-|Lukas Burger|2150580|
-|Maximilian Kürschner|2160331|
+This repository demonstrates a sophisticated implementation of object tracking using a 3D radar sensor. By integrating a Kalman filter and DBSCAN clustering, this code provides a comprehensive solution for accurate and robust detection and tracking of objects in three-dimensional space.
 
-Dozent: Dr.-Ing. Wei Yap Tan  
+![](/code/figs/QMatrix-05-fig1.png)
 
-Fakultät der Informationstechnik  
+## Python algorithm implementations
 
-Hochschule Mannheim  
-Wintersemester 2021/22  
+* [Kalman Filter 1D](/code/KalmanFilter.py)
+* [DBSCAN 3D](/code/DBScan.py)
 
-## Aufgaben
+## Jupyter Notebook documentation
 
-Teilaufgabe 1:
+*docs are in german*
 
-- [x] Implementierung des Kalman-Filters für einen 1D-Radarsensor
-- [x] Stabilität des Kalman-Filters für verschiedene Bewegungsarten erreicht
-- [x] Systematische Anpassung der Q und R-Matrix für verschiedene Bewegungsarten
-- [ ] Verbesserung der Messgenauigkeit des 1D-Radarsensors
-- [ ] Bonus: Strategie zur Erkennung der Bewegungsarten, und somit eine Echtzeitanpassung des Kalman-Filters
-
-Teilaufgabe 2:
-
-- [x] Implementierung des DBScan-Verfahren zur Clusterbildung mit Daten aus dem 3D-Radarsensor
-- [x] Erfolgreiche Clustering mehrerer Objekten + Erkennung von Ausreißer
-- [x] Stabile Clustering-Ergebnis für mehrere Objekte mit unterschiedlicher Bewegungspfaden
-- [x] Anpassung des Kalman-Filters für 3D
-- [x] Sinnvolle Verwendung der Clustering-Ergebnisse als Eingangsdaten des Kalman-Filters
-- [ ] Verbesserung der Messgenauigkeit + Detektion von Ausreißer
-
-## Abgabe
-
-Siehe [Abgabe Ordner](Abgabe)
-
-### Implementierung
-
-* [Kalman Filter 1D](/RadarSensor1D/KalmanFilter.py)
-* [DBSCAN 3D](/RadarSensor3D/DBScan.py)
-* [Kalman Filter 3D](/RadarSensor3D/KalmanFilter.py)
-
-### Dokumentation
-
-* [Bericht als Jupyter Notebook](bericht.ipynb)
-* [Bericht als PDF](bericht.pdf)
-* [Präsentation online](https://docs.google.com/presentation/d/1tMrf8yo_mv9Uo4Sv87vI6JIYx5SxoOuYC4IeCOa-haQ/edit?usp=sharing)
-* [Präsentation als PDF]()
+* [Interactive Jupyter Notebook](/code/PML-Bericht.ipynb)
+* [Interactive Presentation](/code/PML-Praesentation.ipynb)
